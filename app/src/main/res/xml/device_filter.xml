@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Remplace avec des entiers décimaux, sans "0x" -->
+    <usb-device vendor-id="5446" product-id="424" />
+</resources>
