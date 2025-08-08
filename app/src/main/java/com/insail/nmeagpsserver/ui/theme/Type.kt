@@ -1,4 +1,4 @@
-package com.example.nmeagpsserver.ui.theme
+package com.insail.nmeagpsserver.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

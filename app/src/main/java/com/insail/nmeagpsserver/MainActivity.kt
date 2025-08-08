@@ -1,4 +1,4 @@
-package com.example.nmeagpsserver
+package com.insail.nmeagpsserver
 
 import android.app.PendingIntent
 import android.content.*
@@ -17,7 +17,7 @@ import java.net.Inet4Address
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        private const val ACTION_USB_PERMISSION = "com.example.nmeagpsserver.USB_PERMISSION"
+        private const val ACTION_USB_PERMISSION = "com.insail.nmeagpsserver.USB_PERMISSION"
         private const val TAG = "MainActivity"
     }
 

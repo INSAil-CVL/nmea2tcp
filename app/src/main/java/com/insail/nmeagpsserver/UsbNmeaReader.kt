@@ -1,4 +1,4 @@
-package com.example.nmeagpsserver
+package com.insail.nmeagpsserver
 
 import android.content.Context
 import android.hardware.usb.UsbDevice

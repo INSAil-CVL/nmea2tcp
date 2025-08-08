@@ -1,4 +1,4 @@
-package com.example.nmeagpsserver.ui.theme
+package com.insail.nmeagpsserver.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

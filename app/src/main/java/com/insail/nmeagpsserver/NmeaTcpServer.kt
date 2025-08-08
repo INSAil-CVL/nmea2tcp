@@ -1,4 +1,4 @@
-package com.example.nmeagpsserver
+package com.insail.nmeagpsserver
 
 import android.util.Log
 import java.io.IOException

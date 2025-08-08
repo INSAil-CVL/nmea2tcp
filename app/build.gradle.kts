@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.nmeagpsserver"
+    namespace = "com.insail.nmeagpsserver"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.nmeagpsserver"
+        applicationId = "com.insail.nmeagpsserver"
         minSdk = 29
         targetSdk = 36
         versionCode = 1

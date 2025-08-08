@@ -1,4 +1,4 @@
-package com.example.nmeagpsserver
+package com.insail.nmeagpsserver
 
 import org.junit.Test
 
