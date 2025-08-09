@@ -119,3 +119,36 @@ INTERNET → required for TCP server
 usb.host → declares OTG compatibility
 
 ---
+
+## 🛠 Troubleshooting
+
+| Problem | Possible Cause | Solution |
+|---------|----------------|----------|
+| No device detected | OTG not supported / bad cable / USB permission denied | Check OTG, replace cable, accept USB permission prompt |
+| Cannot display IP | No network access | Connect via Wi-Fi or Ethernet |
+| No data in OpenCPN | Wrong IP/port | Verify app’s IP and OpenCPN connection settings |
+| Device ignored | Wrong VID/PID | Update `isGpsDevice()` method |
+| Client count not updating | UI binding issue | Ensure `@id/clientCountText` exists & `Handler` is running |
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create a branch: `feature/xxx` or `fix/xxx`
+3. Commit changes with clear messages
+4. Submit a PR  
+5. Respect license terms (see below)
+
+---
+
+## 📄 License
+
+Distributed under **CC BY-NC-SA 4.0**  
+- **Non-commercial** use only  
+- Credit the author  
+- Share under the same license  
+
+[![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+---
