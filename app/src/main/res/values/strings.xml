@@ -1,3 +1,42 @@
 <resources>
-    <string name="app_name">nmeagpsserver</string>
+    <string name="app_name">NMEA GPS Server</string>
+    <string name="clients_connected">Clients connectés : %1$d</string>
+    <string name="ip_locale">IP locale : %1$s</string>
+    <string name="usb_searching">USB : Recherche…</string>
+    <string name="usb_permission_refusee">USB : Permission refusée</string>
+    <string name="usb_permission_demande">USB : Demande permission…</string>
+    <string name="usb_aucun_device">USB : Aucun device détecté</string>
+    <string name="usb_permission_granted">USB: Permission accordée pour %1$s</string>
+    <string name="usb_permission_refused">USB: Permission refusée pour %1$s</string>
+    <string name="usb_device_connected">USB: Périphérique connecté - %1$s</string>
+    <string name="usb_device_disconnected">USB: Périphérique %1$s déconnecté</string>
+    <string name="usb_disconnected">USB : Déconnecté</string>
+    <string name="tcp_server_started">Serveur TCP démarré sur le port %1$d</string>
+    <string name="tcp_message">TCP: %1$s</string>
+    <string name="usb_scan_start">=== SCAN USB ===</string>
+    <string name="usb_devices_detected">Devices USB détectés: %1$d</string>
+    <string name="usb_no_device">Aucun périphérique USB détecté</string>
+    <string name="usb_analysis">Analyse: vendorId=0x%1$s, productId=0x%2$s</string>
+    <string name="usb_gps_detected">GPS USB détecté: %1$s</string>
+    <string name="usb_permission_already">Permission déjà accordée, démarrage…</string>
+    <string name="usb_permission_request">Demande de permission pour %1$s</string>
+    <string name="usb_generic_serial_detected">Device série générique détecté: %1$s</string>
+    <string name="usb_forced_connection_attempt">Tentative de connexion forcée: %1$s</string>
+    <string name="usb_permission_request_forced">Demande de permission pour tentative forcée: %1$s</string>
+    <string name="usb_device_ignored">Device ignoré (pas série): %1$s</string>
+    <string name="usb_gps_check">Vérification GPS: attendu(0x%1$s/0x%2$s) vs réel(0x%3$s/0x%4$s) = %5$s</string>
+    <string name="usb_start_reading">Démarrage de la lecture depuis: %1$s</string>
+    <string name="usb_reader_status">USB Reader: %1$s</string>
+    <string name="usb_connecte">USB : Connecté (%1$s)</string>
+    <string name="usb_reading_started">Lecture USB démarrée avec succès</string>
+    <string name="unknown">inconnue</string>
+
+    <!-- Logs -->
+    <string name="log_usb_permission_granted">Permission granted for device %1$s</string>
+    <string name="log_usb_permission_denied">Permission denied for device %1$s</string>
+    <string name="log_usb_attached">USB device attached: %1$s</string>
+    <string name="log_usb_detached">USB device detached: %1$s</string>
+    <string name="log_usb_scan">=== SCAN DES DEVICES USB ===</string>
+    <string name="log_usb_device_count">Nombre total de devices USB: %1$d</string>
+    <string name="log_usb_none">Aucun device USB détecté!</string>
 </resources>

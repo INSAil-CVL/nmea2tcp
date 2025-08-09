@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">NMEA GPS Server</string>
+    <string name="clients_connected">Clients connected: %1$d</string>
+    <string name="ip_locale">Local IP: %1$s</string>
+    <string name="usb_searching">USB: Searching…</string>
+    <string name="usb_permission_refusee">USB: Permission denied</string>
+    <string name="usb_permission_demande">USB: Requesting permission…</string>
+    <string name="usb_aucun_device">USB: No device detected</string>
+    <string name="usb_permission_granted">USB: Permission granted for %1$s</string>
+    <string name="usb_permission_refused">USB: Permission denied for %1$s</string>
+    <string name="usb_device_connected">USB: Device connected - %1$s</string>
+    <string name="usb_device_disconnected">USB: Device %1$s disconnected</string>
+    <string name="usb_disconnected">USB: Disconnected</string>
+    <string name="tcp_server_started">TCP server started on port %1$d</string>
+    <string name="tcp_message">TCP: %1$s</string>
+    <string name="usb_scan_start">=== USB SCAN ===</string>
+    <string name="usb_devices_detected">USB devices detected: %1$d</string>
+    <string name="usb_no_device">No USB device detected</string>
+    <string name="usb_analysis">Analysis: vendorId=0x%1$s, productId=0x%2$s</string>
+    <string name="usb_gps_detected">USB GPS detected: %1$s</string>
+    <string name="usb_permission_already">Permission already granted, starting…</string>
+    <string name="usb_permission_request">Requesting permission for %1$s</string>
+    <string name="usb_generic_serial_detected">Generic serial device detected: %1$s</string>
+    <string name="usb_forced_connection_attempt">Forced connection attempt: %1$s</string>
+    <string name="usb_permission_request_forced">Requesting permission for forced attempt: %1$s</string>
+    <string name="usb_device_ignored">Device ignored (not serial): %1$s</string>
+    <string name="usb_gps_check">GPS check: expected(0x%1$s/0x%2$s) vs actual(0x%3$s/0x%4$s) = %5$s</string>
+    <string name="usb_start_reading">Starting reading from: %1$s</string>
+    <string name="usb_reader_status">USB Reader: %1$s</string>
+    <string name="usb_connecte">USB: Connected (%1$s)</string>
+    <string name="usb_reading_started">USB reading started successfully</string>
+    <string name="unknown">unknown</string>
+
+    <!-- Logs -->
+    <string name="log_usb_permission_granted">Permission granted for device %1$s</string>
+    <string name="log_usb_permission_denied">Permission denied for device %1$s</string>
+    <string name="log_usb_attached">USB device attached: %1$s</string>
+    <string name="log_usb_detached">USB device detached: %1$s</string>
+    <string name="log_usb_scan">=== USB DEVICES SCAN ===</string>
+    <string name="log_usb_device_count">Total number of USB devices: %1$d</string>
+    <string name="log_usb_none">No USB device detected!</string>
+</resources>
