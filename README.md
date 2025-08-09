@@ -76,3 +76,11 @@ To accept any serial device, comment/remove this check or create a list of allow
 
 
 ---
+
+### Change TCP Port
+
+Default port is set in `MainActivity`:
+
+```kotlin
+private val tcpServer = NmeaTcpServer(10110) // Change 10110 if needed
+```
