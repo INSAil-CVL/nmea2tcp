@@ -47,14 +47,15 @@ Designed for **plug-and-play** use: displays the local IP, client count, and str
 
 ```bash
 git clone https://github.com/your-username/nmea-gps-server.git
+```
 # Open in Android Studio, then build & run on your Android device
 
 
 ---
 
-⚙ Configuration
+## ⚙ Configuration
 
-Vendor / Product ID
+###Vendor / Product ID
 
 The code checks the GPS Vendor ID and Product ID.
 You must update these values to match your device — otherwise it may be ignored.
@@ -75,7 +76,7 @@ To accept any serial device, comment/remove this check or create a list of allow
 
 ---
 
-Change TCP Port
+### Change TCP Port
 
 Default port is set in MainActivity:
 
@@ -84,7 +85,7 @@ private val tcpServer = NmeaTcpServer(10110) // Change 10110 if needed
 
 ---
 
-▶ Usage
+## ▶ Usage
 
 1. Connect GPS to Android device via OTG.
 
@@ -108,7 +109,7 @@ LOCAL_IP:10110 (or your configured port).
 
 ---
 
-📱 Tested Devices
+## 📱 Tested Devices
 
 Quescan USB-C GPS
 
@@ -122,7 +123,7 @@ Honor MagicPad 2 tablet
 
 ---
 
-📜 Manifest & Permissions
+## 📜 Manifest & Permissions
 
 Ensure AndroidManifest.xml contains:
 
@@ -137,7 +138,7 @@ usb.host → declares OTG compatibility
 
 ---
 
-🛠 Troubleshooting
+## 🛠 Troubleshooting
 
 Problem	Possible Cause	Solution
 
@@ -151,7 +152,7 @@ Client count not updating	UI binding issue	Ensure @id/clientCountText exists & H
 
 ---
 
-🤝 Contributing
+## 🤝 Contributing
 
 1. Fork the repo
 
@@ -172,7 +173,7 @@ Client count not updating	UI binding issue	Ensure @id/clientCountText exists & H
 
 ---
 
-📄 License
+## 📄 License
 
 Distributed under CC BY-NC-SA 4.0
 
@@ -187,10 +188,4 @@ Share under the same license
 
 
 ---
-
----
-
-I made it **more structured**, added **icons for readability**, turned troubleshooting into a **quick reference table**, and made the **developer instructions shorter but clearer**.  
-
-If you want, I can also **add a setup diagram** showing GPS → Android → TCP → OpenCPN for visual clarity in your README. That would make it even more professional for GitHub.
 
