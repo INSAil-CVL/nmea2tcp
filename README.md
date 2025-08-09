@@ -84,3 +84,38 @@ Default port is set in `MainActivity`:
 ```kotlin
 private val tcpServer = NmeaTcpServer(10110) // Change 10110 if needed
 ```
+
+## ▶ Usage
+
+1. Connect GPS to Android device via OTG.
+2. Launch the app:
+   - Local IP address is shown.
+   - TCP client count is displayed.
+3. In **OpenCPN**, add a **TCP network connection** to:  
+   `LOCAL_IP:10110` (or your configured port).
+4. NMEA sentences should appear in OpenCPN in real time.
+
+---
+
+## 📱 Tested Devices
+
+- [Quescan USB-C GPS](https://fr.aliexpress.com/item/1005008593554789.html?)  
+- Honor MagicPad 2 tablet  
+
+> ⚠ This app is provided **as-is**, without warranty.
+
+---
+
+## 📜 Manifest & Permissions
+
+Ensure `AndroidManifest.xml` contains:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-feature android:name="android.hardware.usb.host" android:required="false" />
+```
+
+INTERNET → required for TCP server
+usb.host → declares OTG compatibility
+
+---
