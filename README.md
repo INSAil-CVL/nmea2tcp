@@ -46,5 +46,5 @@ Designed for **plug-and-play** use: displays the local IP, client count, and str
 ## 🔧 Installation
 
 ```bash
-git clone https://github.com/your-username/nmea-gps-server.git
+git clone https://github.com/insail-cvl/nmeagpsserver.git
 ```
