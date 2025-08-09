@@ -1,5 +1,3 @@
----
-
 # NMEA GPS Server for OpenCPN (Android)
 
 Android app that reads GPS data via USB-C (NMEA) and retransmits NMEA sentences to **OpenCPN** through a local TCP server.  
