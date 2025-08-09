@@ -1,111 +1,71 @@
 package com.insail.nmeagpsserver
 
-import android.app.PendingIntent
-import android.content.*
-import android.hardware.usb.UsbDevice
-import android.hardware.usb.UsbManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.hoho.android.usbserial.driver.UsbSerialProber
-import java.net.NetworkInterface
+import androidx.core.content.ContextCompat
 import java.net.Inet4Address
+import java.net.NetworkInterface
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        private const val ACTION_USB_PERMISSION = "com.insail.nmeagpsserver.USB_PERMISSION"
         private const val TAG = "MainActivity"
     }
 
-    private lateinit var usbManager: UsbManager
-    private var usbNmeaReader: UsbNmeaReader? = null
-    private val tcpServer = NmeaTcpServer(10110, this)
-
-    private val handler = Handler(Looper.getMainLooper())
     private lateinit var clientCountText: TextView
-    private val updateInterval = 1000L
+    private lateinit var usbStatusText: TextView
+    private lateinit var logText: TextView
+    private lateinit var nmeaText: TextView
+    private lateinit var localIpText: TextView
 
-    private val updateClientCountRunnable = object : Runnable {
-        override fun run() {
-            val count = tcpServer.getClientCount()
-            runOnUiThread {
-                clientCountText.text = getString(R.string.clients_connected, count)
-            }
-            handler.postDelayed(this, updateInterval)
-        }
-    }
-
-    private val usbReceiver = object : BroadcastReceiver() {
+    private val uiReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null) return
-
             when (intent.action) {
-                ACTION_USB_PERMISSION -> {
-                    synchronized(this) {
-                        @Suppress("DEPRECATION") // pour éviter le warning sur l'ancienne méthode
-                        val device: UsbDevice? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                            intent.getParcelableExtra(UsbManager.EXTRA_DEVICE, UsbDevice::class.java)
-                        } else {
-                            intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
-                        }
+                GpsUsbForegroundService.ACTION_UI_STATUS -> {
+                    val status = intent.getStringExtra(GpsUsbForegroundService.EXTRA_TEXT) ?: return
+                    usbStatusText.text = status
+                    // option : colorer en fonction du contenu
+                    val lower = status.lowercase()
+                    val color = when {
+                        lower.contains("connect") -> android.R.color.holo_green_dark
+                        lower.contains("refus") || lower.contains("déconnect") || lower.contains("error") -> android.R.color.holo_red_dark
+                        else -> android.R.color.darker_gray
+                    }
+                    usbStatusText.setTextColor(getColor(color))
+                }
 
-                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                            device?.let {
-                                Log.i(TAG, getString(R.string.log_usb_permission_granted, it))
-                                appendToSystemView(getString(R.string.usb_permission_granted, it.deviceName))
-                                startReading(it)
-                            }
-                        } else {
-                            Log.w(TAG, getString(R.string.log_usb_permission_denied, device))
-                            appendToSystemView(getString(R.string.usb_permission_refused, device?.deviceName ?: "inconnue"))
-                            runOnUiThread {
-                                findViewById<TextView>(R.id.usbStatus).apply {
-                                    text = getString(R.string.usb_permission_refusee)
-                                    setTextColor(resources.getColor(android.R.color.holo_red_dark, theme))
-                                }
-                            }
+                GpsUsbForegroundService.ACTION_UI_LOG -> {
+                    val msg = intent.getStringExtra(GpsUsbForegroundService.EXTRA_TEXT) ?: return
+                    appendToSystemView(msg)
+                    // Petites heuristiques pour colorer le statut si le service envoie des messages connus
+                    when {
+                        msg.contains("connecté", ignoreCase = true) ||
+                                msg.contains("serial port opened", ignoreCase = true) -> {
+                            usbStatusText.text = getString(R.string.usb_connecte, "")
+                            usbStatusText.setTextColor(getColor(android.R.color.holo_green_dark))
+                        }
+                        msg.contains("déconnecté", ignoreCase = true) ||
+                                msg.contains("refus", ignoreCase = true) ||
+                                msg.contains("failed", ignoreCase = true) -> {
+                            usbStatusText.text = getString(R.string.usb_disconnected)
+                            usbStatusText.setTextColor(getColor(android.R.color.holo_red_dark))
                         }
                     }
                 }
-                UsbManager.ACTION_USB_DEVICE_ATTACHED -> {
-                    @Suppress("DEPRECATION") // pour éviter le warning sur l'ancienne méthode
-                    val device: UsbDevice? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                        intent.getParcelableExtra(UsbManager.EXTRA_DEVICE, UsbDevice::class.java)
-                    } else {
-                        intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
-                    }
-
-                    device?.let {
-                        Log.i(TAG, getString(R.string.log_usb_attached, it))
-                        appendToSystemView(getString(R.string.usb_device_connected, it.deviceName))
-                        handleDeviceAttached(it)
-                    }
+                GpsUsbForegroundService.ACTION_UI_NMEA -> {
+                    val nmea = intent.getStringExtra(GpsUsbForegroundService.EXTRA_TEXT) ?: return
+                    appendToNmeaView(nmea)
                 }
-                UsbManager.ACTION_USB_DEVICE_DETACHED -> {
-                    @Suppress("DEPRECATION") // pour éviter le warning sur l'ancienne méthode
-                    val device: UsbDevice? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                        intent.getParcelableExtra(UsbManager.EXTRA_DEVICE, UsbDevice::class.java)
-                    } else {
-                        intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
-                    }
-                    device?.let {
-                        Log.i(TAG, getString(R.string.log_usb_detached, it))
-                        if (usbNmeaReader != null && it == usbNmeaReader?.device) {
-                            usbNmeaReader?.stop()
-                            usbNmeaReader = null
-                            appendToSystemView(getString(R.string.usb_device_disconnected, it.deviceName))
-                            runOnUiThread {
-                                findViewById<TextView>(R.id.usbStatus).apply {
-                                    text = getString(R.string.usb_disconnected)
-                                    setTextColor(resources.getColor(android.R.color.holo_red_dark, theme))
-                                }
-                            }
-                        }
-                    }
+                GpsUsbForegroundService.ACTION_UI_CLIENTS -> {
+                    val count = intent.getIntExtra(GpsUsbForegroundService.EXTRA_COUNT, 0)
+                    clientCountText.text = getString(R.string.clients_connected, count)
                 }
             }
         }
@@ -116,182 +76,56 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         clientCountText = findViewById(R.id.clientCountText)
+        usbStatusText = findViewById(R.id.usbStatus)
+        logText = findViewById(R.id.logText)
+        nmeaText = findViewById(R.id.nmeaText)
+        localIpText = findViewById(R.id.localIpText)
 
-        val localIpTextView = findViewById<TextView>(R.id.localIpText)
-        localIpTextView.text = getString(R.string.ip_locale, getLocalIpAddress())
+        localIpText.text = getString(R.string.ip_locale, getLocalIpAddress())
+        usbStatusText.text = getString(R.string.usb_searching)
+        usbStatusText.setTextColor(getColor(android.R.color.holo_orange_dark))
 
-        runOnUiThread {
-            findViewById<TextView>(R.id.usbStatus).apply {
-                text = getString(R.string.usb_searching)
-                setTextColor(resources.getColor(android.R.color.holo_orange_dark, theme))
-            }
+        // ✅ Démarre le Foreground Service (il gère USB + TCP + notif)
+        try {
+            val svc = Intent(this, GpsUsbForegroundService::class.java)
+                .setAction(GpsUsbForegroundService.ACTION_START)
+            ContextCompat.startForegroundService(this, svc)
+        } catch (e: Exception) {
+            Log.w(TAG, "Cannot start foreground service: ${e.message}")
+            appendToSystemView("Erreur de démarrage du service: ${e.message}")
         }
 
-        usbManager = getSystemService(USB_SERVICE) as UsbManager
-
-        tcpServer.setLogCallback { message ->
-            appendToSystemView(getString(R.string.tcp_message, message))
-        }
-        tcpServer.start()
-        appendToSystemView(getString(R.string.tcp_server_started, 10110))
-
+        // ✅ Écoute uniquement les diffusions UI du service
         val filter = IntentFilter().apply {
-            addAction(ACTION_USB_PERMISSION)
-            addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
-            addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
+            addAction(GpsUsbForegroundService.ACTION_UI_LOG)
+            addAction(GpsUsbForegroundService.ACTION_UI_NMEA)
+            addAction(GpsUsbForegroundService.ACTION_UI_CLIENTS)
+            addAction(GpsUsbForegroundService.ACTION_UI_STATUS)
         }
-        registerReceiver(usbReceiver, filter, RECEIVER_NOT_EXPORTED)
-
-        Log.i(TAG, getString(R.string.log_usb_scan))
-        val deviceList = usbManager.deviceList
-        Log.i(TAG, getString(R.string.log_usb_device_count, deviceList.size))
-        appendToSystemView(getString(R.string.usb_scan_start))
-        appendToSystemView(getString(R.string.usb_devices_detected, deviceList.size))
-
-        if (deviceList.isEmpty()) {
-            Log.w(TAG, getString(R.string.log_usb_none))
-            appendToSystemView(getString(R.string.usb_no_device))
-            runOnUiThread {
-                findViewById<TextView>(R.id.usbStatus).apply {
-                    text = getString(R.string.usb_aucun_device)
-                    setTextColor(resources.getColor(android.R.color.holo_red_dark, theme))
-                }
-            }
-        } else {
-            deviceList.values.forEach { device ->
-                handleDeviceAttached(device)
-            }
-        }
-
-        handler.post(updateClientCountRunnable)
+        ContextCompat.registerReceiver(
+            this,
+            uiReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     private fun appendToSystemView(message: String) {
-        runOnUiThread {
-            val systemTextView = findViewById<TextView>(R.id.logText)
-            systemTextView.append("$message\n")
-
-            val lines = systemTextView.text.lines()
-            if (lines.size > 100) {
-                systemTextView.text = lines.takeLast(50).joinToString("\n")
-            }
+        val maxLines = 100
+        logText.append("$message\n")
+        val lines = logText.text.lines()
+        if (lines.size > maxLines) {
+            logText.text = lines.takeLast(maxLines / 2).joinToString("\n")
         }
     }
 
     private fun appendToNmeaView(nmea: String) {
-        runOnUiThread {
-            val nmeaTextView = findViewById<TextView>(R.id.nmeaText)
-            nmeaTextView.append("$nmea\n")
-
-            val lines = nmeaTextView.text.lines()
-            if (lines.size > 100) {
-                nmeaTextView.text = lines.takeLast(50).joinToString("\n")
-            }
+        val maxLines = 100
+        nmeaText.append("$nmea\n")
+        val lines = nmeaText.text.lines()
+        if (lines.size > maxLines) {
+            nmeaText.text = lines.takeLast(maxLines / 2).joinToString("\n")
         }
-    }
-
-    private fun handleDeviceAttached(device: UsbDevice) {
-        appendToSystemView(getString(R.string.usb_analysis, device.vendorId.toString(16).uppercase(), device.productId.toString(16).uppercase()))
-
-        if (isGpsDevice(device)) {
-            appendToSystemView(getString(R.string.usb_gps_detected, device.deviceName))
-            if (usbManager.hasPermission(device)) {
-                appendToSystemView(getString(R.string.usb_permission_already))
-                startReading(device)
-            } else {
-                val permissionIntent = PendingIntent.getBroadcast(
-                    this,
-                    0,
-                    Intent(ACTION_USB_PERMISSION),
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
-                usbManager.requestPermission(device, permissionIntent)
-                appendToSystemView(getString(R.string.usb_permission_request, device.deviceName))
-                runOnUiThread {
-                    findViewById<TextView>(R.id.usbStatus).apply {
-                        text = getString(R.string.usb_permission_demande)
-                        setTextColor(resources.getColor(android.R.color.holo_orange_dark, theme))
-                    }
-                }
-            }
-        } else {
-            val availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)
-            val hasDriver = availableDrivers.any { it.device == device }
-
-            if (hasDriver) {
-                appendToSystemView(getString(R.string.usb_generic_serial_detected, device.deviceName))
-                if (usbManager.hasPermission(device)) {
-                    startReading(device)
-                } else {
-                    val permissionIntent = PendingIntent.getBroadcast(
-                        this,
-                        0,
-                        Intent(ACTION_USB_PERMISSION),
-                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-                    usbManager.requestPermission(device, permissionIntent)
-                    appendToSystemView(getString(R.string.usb_permission_request, device.deviceName))
-                }
-            } else {
-                if (device.deviceClass == 2 || device.deviceSubclass == 2 || device.vendorId == 0x1546) {
-                    appendToSystemView(getString(R.string.usb_forced_connection_attempt, device.deviceName))
-                    if (usbManager.hasPermission(device)) {
-                        startReading(device)
-                    } else {
-                        val permissionIntent = PendingIntent.getBroadcast(
-                            this,
-                            0,
-                            Intent(ACTION_USB_PERMISSION),
-                            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                        )
-                        usbManager.requestPermission(device, permissionIntent)
-                        appendToSystemView(getString(R.string.usb_permission_request_forced, device.deviceName))
-                    }
-                } else {
-                    appendToSystemView(getString(R.string.usb_device_ignored, device.deviceName))
-                }
-            }
-        }
-    }
-
-    private fun isGpsDevice(device: UsbDevice): Boolean {
-        val targetVendorId = 0x1546
-        val targetProductId = 0x01A8
-
-        val match = device.vendorId == targetVendorId && device.productId == targetProductId
-        appendToSystemView(getString(R.string.usb_gps_check,
-            targetVendorId.toString(16).uppercase(),
-            targetProductId.toString(16).uppercase(),
-            device.vendorId.toString(16).uppercase(),
-            device.productId.toString(16).uppercase(),
-            if (match) "MATCH" else "NON"
-        ))
-        return match
-    }
-
-    private fun startReading(device: UsbDevice) {
-        appendToSystemView(getString(R.string.usb_start_reading, device.deviceName))
-
-        usbNmeaReader?.stop()
-        usbNmeaReader = UsbNmeaReader(this, device, usbManager,
-            onNmeaLine = { nmeaLine ->
-                appendToNmeaView(nmeaLine)
-                tcpServer.sendToClients(nmeaLine)
-            },
-            onStatusUpdate = { message ->
-                appendToSystemView(getString(R.string.usb_reader_status, message))
-            }
-        )
-
-        usbNmeaReader?.start()
-
-        runOnUiThread {
-            findViewById<TextView>(R.id.usbStatus).apply {
-                text = getString(R.string.usb_connecte, device.deviceName)
-                setTextColor(resources.getColor(android.R.color.holo_green_dark, theme))
-            }
-        }
-        appendToSystemView(getString(R.string.usb_reading_started))
     }
 
     private fun getLocalIpAddress(): String {
@@ -305,17 +139,12 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        } catch (_: Exception) {}
+        } catch (_: Exception) { }
         return getString(R.string.unknown)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        try {
-            unregisterReceiver(usbReceiver)
-        } catch (_: Exception) {}
-        usbNmeaReader?.stop()
-        tcpServer.stop()
-        handler.removeCallbacks(updateClientCountRunnable)
+        try { unregisterReceiver(uiReceiver) } catch (_: Exception) { }
     }
 }

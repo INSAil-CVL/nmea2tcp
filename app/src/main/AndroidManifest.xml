@@ -4,6 +4,15 @@
     <uses-feature android:name="android.hardware.usb.host" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Permissions Foreground Service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Types recommandés Android 14+ -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <!-- Android 13+ : permission runtime pour afficher des notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:label="NMEA GPS Server"
@@ -16,13 +25,13 @@
             android:name=".MainActivity"
             android:exported="true">
 
-            <!-- 📌 Ajout pour que l’app soit lançable depuis le launcher -->
+            <!-- Lancement depuis le launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- 📌 Pour déclencher l'app à la connexion d’un GPS USB -->
+            <!-- Pour détecter l’attache USB si l’activité est en avant-plan -->
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
@@ -30,8 +39,22 @@
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
-
         </activity>
+
+        <!-- Foreground Service (arrière-plan) -->
+        <service
+            android:name=".GpsUsbForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice|dataSync" />
+
+        <!-- Receiver pour lancer le service même si l’app est fermée -->
+        <receiver
+            android:name=".UsbAttachReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

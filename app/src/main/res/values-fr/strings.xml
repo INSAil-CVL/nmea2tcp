@@ -78,4 +78,22 @@
     <string name="tcp_data_sent">Données envoyées à %1$d clients, %2$d déconnectés</string>
     <string name="tcp_server_stopping">Arrêt du serveur TCP…</string>
     <string name="tcp_server_stopped">Serveur TCP arrêté</string>
+
+    <!-- Notification -->
+    <string name="notif_channel_desc">NMEA over TCP</string>
+    <string name="log_usb_start_service">USB device attached → starting service</string>
+
+    <!-- Status -->
+    <string name="usb_connected_with_baud">Connecté @ %1$d baud</string>
+    <string name="usb_status_permission_refused">Permission USB refusée</string>
+    <string name="usb_status_disconnected">Déconnecté</string>
+    <string name="usb_status_searching">Recherche en cours…</string>
+
+    <!-- mots clés pour filtrer les logs techniques -->
+    <string name="usb_log_kw_driver">driver</string>
+    <string name="usb_log_kw_baud">baud</string>
+    <string name="usb_log_kw_test">test</string>
+    <string name="usb_log_kw_trying">trying</string>
+    <string name="usb_log_kw_loop">loop</string>
+    <string name="usb_log_kw_starting">starting</string>
 </resources>
