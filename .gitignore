@@ -16,4 +16,5 @@
 .cxx
 local.properties
 /dict/*
-/dict/fr/
+/dict/fr/index.aff
+/dict/fr/index.dic
