@@ -48,3 +48,4 @@ Designed for **plug-and-play** use: displays the local IP, client count, and str
 ```bash
 git clone https://github.com/insail-cvl/nmeagpsserver.git
 ```
+Open in Android Studio, then build & run on your Android device
