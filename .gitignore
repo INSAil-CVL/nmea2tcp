@@ -1,4 +1,6 @@
 *.iml
+*.aff
+*.dic
 .gradle
 /local.properties
 /.idea/caches
@@ -13,4 +15,5 @@
 .externalNativeBuild
 .cxx
 local.properties
-/dict/
+/dict/*
+/dict/fr/
