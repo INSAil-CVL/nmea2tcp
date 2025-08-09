@@ -55,7 +55,7 @@ git clone https://github.com/your-username/nmea-gps-server.git
 
 ## ⚙ Configuration
 
-###Vendor / Product ID
+### Vendor / Product ID
 
 The code checks the GPS Vendor ID and Product ID.
 You must update these values to match your device — otherwise it may be ignored.
