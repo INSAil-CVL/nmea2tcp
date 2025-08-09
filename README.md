@@ -49,3 +49,30 @@ Designed for **plug-and-play** use: displays the local IP, client count, and str
 git clone https://github.com/insail-cvl/nmeagpsserver.git
 ```
 Open in Android Studio, then build & run on your Android device
+
+---
+
+## ⚙ Configuration
+
+### Vendor / Product ID
+
+The code checks the GPS **Vendor ID** and **Product ID**.  
+You must update these values to match your device — otherwise it may be ignored.
+
+Example (`MainActivity.kt`):
+
+```kotlin
+private fun isGpsDevice(device: UsbDevice): Boolean {
+    // <-- CHANGE HERE for your GPS
+    val targetVendorId = 0x1546     // Replace with your GPS vendor ID
+    val targetProductId = 0x01A8    // Replace with your GPS product ID
+
+    return device.vendorId == targetVendorId && device.productId == targetProductId
+}
+```
+
+💡 Tip:
+To accept any serial device, comment/remove this check or create a list of allowed VID/PID values.
+
+
+---
