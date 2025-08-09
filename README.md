@@ -1,61 +1,88 @@
-# NMEA GPS Server for OpenCPN (Android)
+NMEA GPS Server for OpenCPN (Android)
 
-Android app that reads GPS data via USB-C (NMEA) and retransmits NMEA sentences to **OpenCPN** through a local TCP server.  
-Designed for **plug-and-play** use: displays the local IP, client count, and streams NMEA data directly to OpenCPN.
+Android app that reads GPS data via USB-C (NMEA) and retransmits NMEA sentences to OpenCPN through a local TCP server.
+Designed for plug-and-play use: displays the local IP, client count, and streams NMEA data directly to OpenCPN.
 
----
-
-## 📑 Table of Contents
-
-- [Features](#features)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Configuration](#configuration)
-  - [Vendor / Product ID](#vendor--product-id)
-  - [Change TCP Port](#change-tcp-port)
-- [Usage](#usage)
-- [Tested Devices](#tested-devices)
-- [Manifest & Permissions](#manifest--permissions)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [License](#license)
 
 ---
 
-## 🚀 Features
+📑 Table of Contents
 
-- Reads NMEA sentences from a USB-C GPS.
-- Runs a **local TCP server** (default port `10110`).
-- Displays:
-  - Latest NMEA messages
-  - System logs
-  - Local IP address
-  - Connected client count
-- Supports multiple TCP clients simultaneously.
+Features
+
+Requirements
+
+Installation
+
+Configuration
+
+Vendor / Product ID
+
+Change TCP Port
+
+
+Usage
+
+Tested Devices
+
+Manifest & Permissions
+
+Troubleshooting
+
+Contributing
+
+License
+
+
 
 ---
 
-## 📋 Requirements
+🚀 Features
 
-- **Android Studio** (latest version)
-- Android device with **OTG / USB Host** support (USB-C)
-- NMEA-compatible GPS over USB (or serial-to-USB adapter)
+Reads NMEA sentences from a USB-C GPS.
+
+Runs a local TCP server (default port 10110).
+
+Displays:
+
+Latest NMEA messages
+
+System logs
+
+Local IP address
+
+Connected client count
+
+
+Supports multiple TCP clients simultaneously.
+
+
 
 ---
 
-## 🔧 Installation
+📋 Requirements
 
-```bash
+Android Studio (latest version)
+
+Android device with OTG / USB Host support (USB-C)
+
+NMEA-compatible GPS over USB (or serial-to-USB adapter)
+
+
+
+---
+
+🔧 Installation
+
 git clone https://github.com/your-username/nmea-gps-server.git
-```
 # Open in Android Studio, then build & run on your Android device
 
 
 ---
 
-## ⚙ Configuration
+⚙ Configuration
 
-### Vendor / Product ID
+Vendor / Product ID
 
 The code checks the GPS Vendor ID and Product ID.
 You must update these values to match your device — otherwise it may be ignored.
@@ -76,7 +103,7 @@ To accept any serial device, comment/remove this check or create a list of allow
 
 ---
 
-### Change TCP Port
+Change TCP Port
 
 Default port is set in MainActivity:
 
@@ -85,7 +112,7 @@ private val tcpServer = NmeaTcpServer(10110) // Change 10110 if needed
 
 ---
 
-## ▶ Usage
+▶ Usage
 
 1. Connect GPS to Android device via OTG.
 
@@ -109,7 +136,7 @@ LOCAL_IP:10110 (or your configured port).
 
 ---
 
-## 📱 Tested Devices
+📱 Tested Devices
 
 Quescan USB-C GPS
 
@@ -123,7 +150,7 @@ Honor MagicPad 2 tablet
 
 ---
 
-## 📜 Manifest & Permissions
+📜 Manifest & Permissions
 
 Ensure AndroidManifest.xml contains:
 
@@ -138,7 +165,7 @@ usb.host → declares OTG compatibility
 
 ---
 
-## 🛠 Troubleshooting
+🛠 Troubleshooting
 
 Problem	Possible Cause	Solution
 
@@ -152,7 +179,7 @@ Client count not updating	UI binding issue	Ensure @id/clientCountText exists & H
 
 ---
 
-## 🤝 Contributing
+🤝 Contributing
 
 1. Fork the repo
 
@@ -173,7 +200,7 @@ Client count not updating	UI binding issue	Ensure @id/clientCountText exists & H
 
 ---
 
-## 📄 License
+📄 License
 
 Distributed under CC BY-NC-SA 4.0
 
