@@ -11,6 +11,7 @@ Application Android qui lit un GPS via USB-C (NMEA) et retransmet les phrases NM
 * [Installation](#installation)
 * [Configuration importante (Vendor / Product ID)](#configuration-importante-vendor--product-id)
 * [Utilisation](#utilisation)
+* [Appareils compatibles](#appareils-compatibles)
 * [Manifest & permissions](#manifest--permissions)
 * [Dépannage rapide](#dépannage-rapide)
 * [Contribuer](#contribuer)
@@ -81,6 +82,15 @@ private val tcpServer = NmeaTcpServer(10110) // changer 10110 si besoin
    * L’app affiche le nombre de clients TCP connectés.
 3. Dans **OpenCPN** : ajouter une connexion réseau TCP vers `IP_locale:10110` (ou le port configuré).
 4. Les phrases NMEA apparaitront dans OpenCPN en temps réel.
+
+---
+
+## Appareils compatibles
+
+[L'application a été testée sur le GPS USB-C Quescan](https://fr.aliexpress.com/item/1005008593554789.html?)
+Et sur une tablette Honor MagicPad 2.
+
+Cette application est proposée sans garanties de fonctionnement.
 
 ---
 
