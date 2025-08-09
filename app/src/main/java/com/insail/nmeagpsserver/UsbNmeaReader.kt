@@ -27,26 +27,23 @@ class UsbNmeaReader(
 
     fun start() {
         Log.i(TAG, "Starting USB NMEA Reader for device: ${device.deviceName}")
-        onStatusUpdate("Démarrage du lecteur USB pour: ${device.deviceName}")
+        onStatusUpdate(context.getString(R.string.usb_starting_reader, device.deviceName))
 
-        // Essayer d'abord avec le prober par défaut
         val defaultProber = UsbSerialProber.getDefaultProber()
-        var availableDrivers = defaultProber.findAllDrivers(usbManager)
+        val availableDrivers = defaultProber.findAllDrivers(usbManager)
         Log.i(TAG, "Default drivers found: ${availableDrivers.size}")
-        onStatusUpdate("Drivers par défaut trouvés: ${availableDrivers.size}")
+        onStatusUpdate(context.getString(R.string.usb_default_drivers_found, availableDrivers.size))
 
         availableDrivers.forEach {
             Log.i(TAG, "Driver for device: ${it.device.deviceName}")
-            onStatusUpdate("Driver disponible pour: ${it.device.deviceName}")
+            onStatusUpdate(context.getString(R.string.usb_driver_available_for, it.device.deviceName))
         }
 
         var driver = availableDrivers.find { it.device == device }
 
-        // Si aucun driver trouvé avec le prober par défaut, essayer manuellement différents drivers
         if (driver == null) {
-            onStatusUpdate("Aucun driver par défaut, essai manuel des drivers...")
+            onStatusUpdate(context.getString(R.string.usb_no_default_driver_try_manual))
 
-            // Liste des drivers à essayer
             val driverClasses = listOf(
                 com.hoho.android.usbserial.driver.CdcAcmSerialDriver::class.java,
                 com.hoho.android.usbserial.driver.FtdiSerialDriver::class.java,
@@ -57,112 +54,107 @@ class UsbNmeaReader(
 
             for (driverClass in driverClasses) {
                 try {
-                    onStatusUpdate("Essai du driver: ${driverClass.simpleName}")
+                    onStatusUpdate(context.getString(R.string.usb_trying_driver, driverClass.simpleName))
 
-                    // Vérifier si ce driver supporte notre device
                     val method = driverClass.getMethod("getSupportedDevices")
+                    @Suppress("UNCHECKED_CAST")
                     val supportedDevices = method.invoke(null) as Map<Int, IntArray>
 
                     val vendorId = device.vendorId
                     val productId = device.productId
 
-                    // Vérifier si notre device est supporté
                     val isSupported = supportedDevices[vendorId]?.contains(productId) == true
 
                     if (isSupported || driverClass.simpleName.contains("CdcAcm")) {
-                        // Essayer de créer le driver
                         val constructor = driverClass.getConstructor(UsbDevice::class.java)
                         driver = constructor.newInstance(device) as com.hoho.android.usbserial.driver.UsbSerialDriver
-                        onStatusUpdate("Driver ${driverClass.simpleName} créé avec succès!")
+                        onStatusUpdate(context.getString(R.string.usb_driver_created_success, driverClass.simpleName))
                         break
                     } else {
-                        onStatusUpdate("Device non supporté par ${driverClass.simpleName}")
+                        onStatusUpdate(context.getString(R.string.usb_driver_not_supported, driverClass.simpleName))
                     }
                 } catch (e: Exception) {
                     Log.w(TAG, "Failed to create driver ${driverClass.simpleName}: ${e.message}")
-                    onStatusUpdate("Échec ${driverClass.simpleName}: ${e.message}")
+                    onStatusUpdate(context.getString(R.string.usb_driver_creation_failed, driverClass.simpleName, e.message ?: ""))
                 }
             }
         }
 
-        // Dernière tentative avec CDC-ACM générique (souvent compatible avec les GPS)
         if (driver == null) {
-            onStatusUpdate("Dernière tentative avec CDC-ACM générique...")
+            onStatusUpdate(context.getString(R.string.usb_try_generic_cdc_acm))
             try {
                 driver = com.hoho.android.usbserial.driver.CdcAcmSerialDriver(device)
-                onStatusUpdate("Driver CDC-ACM générique créé")
+                onStatusUpdate(context.getString(R.string.usb_generic_cdc_acm_created))
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to create CDC-ACM driver: ${e.message}")
-                onStatusUpdate("Échec création driver CDC-ACM: ${e.message}")
+                onStatusUpdate(context.getString(R.string.usb_generic_cdc_acm_failed, e.message ?: ""))
             }
         }
+
         if (driver == null) {
             Log.e(TAG, "No suitable USB driver found for device!")
-            onStatusUpdate("ERREUR: Aucun driver USB trouvé!")
+            onStatusUpdate(context.getString(R.string.usb_no_driver_found))
             return
         }
 
         val connection = usbManager.openDevice(driver.device)
         if (connection == null) {
             Log.e(TAG, "Failed to open connection to device!")
-            onStatusUpdate("ERREUR: Impossible d'ouvrir la connexion!")
+            onStatusUpdate(context.getString(R.string.usb_connection_failed))
             return
         }
 
         serialPort = driver.ports.firstOrNull()
         if (serialPort == null) {
             Log.e(TAG, "No serial port found on the device!")
-            onStatusUpdate("ERREUR: Aucun port série trouvé!")
+            onStatusUpdate(context.getString(R.string.usb_no_serial_port))
             connection.close()
             return
         }
 
         try {
-            // Ouvrir le port une seule fois
             serialPort?.open(connection)
-            onStatusUpdate("Port série ouvert avec succès")
+            onStatusUpdate(context.getString(R.string.usb_serial_port_opened))
 
-            // Essayer différents bauds rates couramment utilisés pour NMEA
             val baudRates = listOf(4800, 9600, 38400, 115200)
             var connected = false
 
-            onStatusUpdate("Test des vitesses de communication...")
+            onStatusUpdate(context.getString(R.string.usb_testing_baud_rates))
             for (baudRate in baudRates) {
                 try {
                     serialPort?.setParameters(baudRate, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
                     Log.i(TAG, "Trying baudrate: $baudRate")
-                    onStatusUpdate("Test à $baudRate bauds...")
+                    onStatusUpdate(context.getString(R.string.usb_testing_baud_rate, baudRate))
 
-                    // Test de lecture rapide pour vérifier si on reçoit des données
                     val testBuffer = ByteArray(64)
                     val testLen = serialPort?.read(testBuffer, 1000) ?: 0
                     if (testLen > 0) {
                         Log.i(TAG, "Successfully connected at $baudRate baud")
-                        onStatusUpdate("Connexion réussie à $baudRate bauds!")
+                        onStatusUpdate(context.getString(R.string.usb_connected_baud_rate, baudRate))
                         connected = true
                         break
                     }
                 } catch (e: IOException) {
                     Log.w(TAG, "Failed to set baudrate $baudRate: ${e.message}")
-                    onStatusUpdate("Échec à $baudRate bauds: ${e.message}")
+                    onStatusUpdate(context.getString(R.string.usb_failed_baud_rate, baudRate, e.message ?: ""))
                 }
             }
 
             if (!connected) {
                 Log.w(TAG, "No data received at any baudrate, using 4800 as default")
-                onStatusUpdate("Aucune donnée reçue, utilisation de 4800 bauds par défaut")
+                onStatusUpdate(context.getString(R.string.usb_no_data_default_baud))
                 serialPort?.setParameters(4800, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
             }
 
         } catch (e: IOException) {
             Log.e(TAG, "Error opening serial port: ${e.message}")
-            onStatusUpdate("ERREUR d'ouverture du port série: ${e.message}")
+            onStatusUpdate(context.getString(R.string.usb_serial_port_error_opening, e.message ?: ""))
             connection.close()
             return
         }
 
         running = true
-        onStatusUpdate("Démarrage de la boucle de lecture...")
+        onStatusUpdate(context.getString(R.string.usb_start_read_loop))
 
         executor.execute {
             val buffer = ByteArray(1024)
@@ -172,21 +164,17 @@ class UsbNmeaReader(
 
             while (running) {
                 try {
-                    // Timeout plus long pour les GPS lents
                     val len = serialPort?.read(buffer, 5000) ?: 0
 
                     if (len > 0) {
                         val rawData = buffer.copyOf(len).toString(Charset.forName("US-ASCII"))
                         Log.d(TAG, "Raw data received (${len} bytes): ${rawData.replace("\r", "\\r").replace("\n", "\\n")}")
-                        //onStatusUpdate("Données reçues: $len octets")
 
                         partialLine += rawData
 
-                        // Traiter ligne par ligne (NMEA se termine par \r\n ou \n)
                         while (true) {
                             var lineEndIndex = partialLine.indexOf('\n')
                             if (lineEndIndex == -1) {
-                                // Essayer juste \r si pas de \n
                                 lineEndIndex = partialLine.indexOf('\r')
                                 if (lineEndIndex == -1) break
                             }
@@ -201,25 +189,24 @@ class UsbNmeaReader(
                         }
                     } else {
                         Log.d(TAG, "No data received (timeout)")
-                        // Pas de log UI pour timeout pour éviter de spammer
                     }
 
                 } catch (e: IOException) {
                     Log.e(TAG, "Error reading from serial port: ${e.message}")
-                    onStatusUpdate("ERREUR de lecture: ${e.message}")
+                    onStatusUpdate(context.getString(R.string.usb_read_error, e.message ?: ""))
                     break
                 }
             }
 
             try {
                 serialPort?.close()
-                onStatusUpdate("Port série fermé")
+                onStatusUpdate(context.getString(R.string.usb_serial_port_closed))
             } catch (e: IOException) {
                 Log.w(TAG, "Error closing serial port: ${e.message}")
-                onStatusUpdate("Erreur de fermeture: ${e.message}")
+                onStatusUpdate(context.getString(R.string.usb_serial_port_close_error, e.message ?: ""))
             }
             Log.i(TAG, "USB NMEA Reader stopped.")
-            onStatusUpdate("Lecteur USB arrêté")
+            onStatusUpdate(context.getString(R.string.usb_reader_stopped))
         }
     }
 
@@ -230,9 +217,9 @@ class UsbNmeaReader(
             serialPort?.close()
         } catch (e: IOException) {
             Log.w(TAG, "Error closing serial port on stop: ${e.message}")
-            onStatusUpdate("Erreur à l'arrêt: ${e.message}")
+            onStatusUpdate(context.getString(R.string.usb_stop_error, e.message ?: ""))
         }
         Log.i(TAG, "UsbNmeaReader stopped and port closed.")
-        onStatusUpdate("Lecteur USB arrêté et port fermé")
+        onStatusUpdate(context.getString(R.string.usb_reader_stopped_and_closed))
     }
 }

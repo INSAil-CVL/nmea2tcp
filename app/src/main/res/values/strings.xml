@@ -1,42 +1,80 @@
 <resources>
     <string name="app_name">NMEA GPS Server</string>
-    <string name="clients_connected">Clients connectés : %1$d</string>
-    <string name="ip_locale">IP locale : %1$s</string>
-    <string name="usb_searching">USB : Recherche…</string>
-    <string name="usb_permission_refusee">USB : Permission refusée</string>
-    <string name="usb_permission_demande">USB : Demande permission…</string>
-    <string name="usb_aucun_device">USB : Aucun device détecté</string>
-    <string name="usb_permission_granted">USB: Permission accordée pour %1$s</string>
-    <string name="usb_permission_refused">USB: Permission refusée pour %1$s</string>
-    <string name="usb_device_connected">USB: Périphérique connecté - %1$s</string>
-    <string name="usb_device_disconnected">USB: Périphérique %1$s déconnecté</string>
-    <string name="usb_disconnected">USB : Déconnecté</string>
-    <string name="tcp_server_started">Serveur TCP démarré sur le port %1$d</string>
+    <string name="clients_connected">Clients connected: %1$d</string>
+    <string name="ip_locale">Local IP: %1$s</string>
+    <string name="usb_searching">USB: Searching…</string>
+    <string name="usb_permission_refusee">USB: Permission denied</string>
+    <string name="usb_permission_demande">USB: Requesting permission…</string>
+    <string name="usb_aucun_device">USB: No device detected</string>
+    <string name="usb_permission_granted">USB: Permission granted for %1$s</string>
+    <string name="usb_permission_refused">USB: Permission denied for %1$s</string>
+    <string name="usb_device_connected">USB: Device connected - %1$s</string>
+    <string name="usb_device_disconnected">USB: Device %1$s disconnected</string>
+    <string name="usb_disconnected">USB: Disconnected</string>
+    <string name="tcp_server_started">TCP server started on port %1$d</string>
     <string name="tcp_message">TCP: %1$s</string>
-    <string name="usb_scan_start">=== SCAN USB ===</string>
-    <string name="usb_devices_detected">Devices USB détectés: %1$d</string>
-    <string name="usb_no_device">Aucun périphérique USB détecté</string>
-    <string name="usb_analysis">Analyse: vendorId=0x%1$s, productId=0x%2$s</string>
-    <string name="usb_gps_detected">GPS USB détecté: %1$s</string>
-    <string name="usb_permission_already">Permission déjà accordée, démarrage…</string>
-    <string name="usb_permission_request">Demande de permission pour %1$s</string>
-    <string name="usb_generic_serial_detected">Device série générique détecté: %1$s</string>
-    <string name="usb_forced_connection_attempt">Tentative de connexion forcée: %1$s</string>
-    <string name="usb_permission_request_forced">Demande de permission pour tentative forcée: %1$s</string>
-    <string name="usb_device_ignored">Device ignoré (pas série): %1$s</string>
-    <string name="usb_gps_check">Vérification GPS: attendu(0x%1$s/0x%2$s) vs réel(0x%3$s/0x%4$s) = %5$s</string>
-    <string name="usb_start_reading">Démarrage de la lecture depuis: %1$s</string>
+    <string name="usb_scan_start">=== USB SCAN ===</string>
+    <string name="usb_devices_detected">USB devices detected: %1$d</string>
+    <string name="usb_no_device">No USB device detected</string>
+    <string name="usb_analysis">Analysis: vendorId=0x%1$s, productId=0x%2$s</string>
+    <string name="usb_gps_detected">USB GPS detected: %1$s</string>
+    <string name="usb_permission_already">Permission already granted, starting…</string>
+    <string name="usb_permission_request">Requesting permission for %1$s</string>
+    <string name="usb_generic_serial_detected">Generic serial device detected: %1$s</string>
+    <string name="usb_forced_connection_attempt">Forced connection attempt: %1$s</string>
+    <string name="usb_permission_request_forced">Requesting permission for forced attempt: %1$s</string>
+    <string name="usb_device_ignored">Device ignored (not serial): %1$s</string>
+    <string name="usb_gps_check">GPS check: expected(0x%1$s/0x%2$s) vs actual(0x%3$s/0x%4$s) = %5$s</string>
+    <string name="usb_start_reading">Starting reading from: %1$s</string>
     <string name="usb_reader_status">USB Reader: %1$s</string>
-    <string name="usb_connecte">USB : Connecté (%1$s)</string>
-    <string name="usb_reading_started">Lecture USB démarrée avec succès</string>
-    <string name="unknown">inconnue</string>
+    <string name="usb_connecte">USB: Connected (%1$s)</string>
+    <string name="usb_reading_started">USB reading started successfully</string>
+    <string name="unknown">unknown</string>
 
     <!-- Logs -->
     <string name="log_usb_permission_granted">Permission granted for device %1$s</string>
     <string name="log_usb_permission_denied">Permission denied for device %1$s</string>
     <string name="log_usb_attached">USB device attached: %1$s</string>
     <string name="log_usb_detached">USB device detached: %1$s</string>
-    <string name="log_usb_scan">=== SCAN DES DEVICES USB ===</string>
-    <string name="log_usb_device_count">Nombre total de devices USB: %1$d</string>
-    <string name="log_usb_none">Aucun device USB détecté!</string>
+    <string name="log_usb_scan">=== USB DEVICES SCAN ===</string>
+    <string name="log_usb_device_count">Total number of USB devices: %1$d</string>
+    <string name="log_usb_none">No USB device detected!</string>
+
+    <!-- UsbNmea -->
+    <string name="usb_starting_reader">Starting USB reader for: %1$s</string>
+    <string name="usb_default_drivers_found">Default drivers found: %1$d</string>
+    <string name="usb_driver_available_for">Driver available for: %1$s</string>
+    <string name="usb_no_default_driver_try_manual">No default driver, trying manual drivers…</string>
+    <string name="usb_trying_driver">Trying driver: %1$s</string>
+    <string name="usb_driver_created_success">Driver %1$s created successfully!</string>
+    <string name="usb_driver_not_supported">Device not supported by %1$s</string>
+    <string name="usb_driver_creation_failed">Failed %1$s: %2$s</string>
+    <string name="usb_try_generic_cdc_acm">Last attempt with generic CDC-ACM…</string>
+    <string name="usb_generic_cdc_acm_created">Generic CDC-ACM driver created</string>
+    <string name="usb_generic_cdc_acm_failed">Failed to create CDC-ACM driver: %1$s</string>
+    <string name="usb_no_driver_found">ERROR: No USB driver found!</string>
+    <string name="usb_connection_failed">ERROR: Failed to open connection!</string>
+    <string name="usb_no_serial_port">ERROR: No serial port found!</string>
+    <string name="usb_serial_port_opened">Serial port opened successfully</string>
+    <string name="usb_testing_baud_rates">Testing baud rates…</string>
+    <string name="usb_testing_baud_rate">Testing at %1$d baud…</string>
+    <string name="usb_connected_baud_rate">Successfully connected at %1$d baud!</string>
+    <string name="usb_failed_baud_rate">Failed at %1$d baud: %2$s</string>
+    <string name="usb_no_data_default_baud">No data received, using 4800 baud as default</string>
+    <string name="usb_serial_port_error_opening">ERROR opening serial port: %1$s</string>
+    <string name="usb_start_read_loop">Starting read loop…</string>
+    <string name="usb_read_error">ERROR reading: %1$s</string>
+    <string name="usb_serial_port_closed">Serial port closed</string>
+    <string name="usb_serial_port_close_error">Error closing serial port: %1$s</string>
+    <string name="usb_reader_stopped">USB reader stopped</string>
+    <string name="usb_stop_error">Error on stop: %1$s</string>
+    <string name="usb_reader_stopped_and_closed">USB reader stopped and port closed</string>
+
+    <!-- TCP -->
+    <string name="tcp_client_connected">Client connected: %1$s</string>
+    <string name="tcp_client_disconnected">Client disconnected: %1$s</string>
+    <string name="tcp_server_error">Server error: %1$s</string>
+    <string name="tcp_data_sent">Data sent to %1$d clients, %2$d disconnected</string>
+    <string name="tcp_server_stopping">Stopping TCP server…</string>
+    <string name="tcp_server_stopped">TCP server stopped</string>
 </resources>

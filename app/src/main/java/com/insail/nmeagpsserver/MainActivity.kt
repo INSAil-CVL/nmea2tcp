@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var usbManager: UsbManager
     private var usbNmeaReader: UsbNmeaReader? = null
-    private val tcpServer = NmeaTcpServer(10110)
+    private val tcpServer = NmeaTcpServer(10110, this)
 
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var clientCountText: TextView

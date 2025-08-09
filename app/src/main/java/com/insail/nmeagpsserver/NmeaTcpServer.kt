@@ -6,8 +6,9 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.net.InetAddress
 import java.util.*
+import android.content.Context
 
-class NmeaTcpServer(private val port: Int) {
+class NmeaTcpServer(private val port: Int, private val context: Context) {
 
     companion object {
         private const val TAG = "NmeaTcpServer"
@@ -31,11 +32,11 @@ class NmeaTcpServer(private val port: Int) {
         serverThread = Thread {
             try {
                 serverSocket = ServerSocket(port, 0, InetAddress.getByName("0.0.0.0"))
-                logToUI("Serveur démarré sur le port $port")
+                logToUI(context.getString(R.string.tcp_server_started, port))
                 while (!Thread.currentThread().isInterrupted) {
                     val client = serverSocket!!.accept()
                     val clientAddress = client.inetAddress.hostAddress
-                    logToUI("Client connecté: $clientAddress")
+                    logToUI(context.getString(R.string.tcp_client_connected, clientAddress))
                     clients.add(client)
 
                     Thread {
@@ -46,14 +47,14 @@ class NmeaTcpServer(private val port: Int) {
                         } finally {
                             clients.remove(client)
                             client.close()
-                            logToUI("Client déconnecté: $clientAddress")
+                            logToUI(context.getString(R.string.tcp_client_disconnected, clientAddress))
                         }
                     }.start()
                 }
             } catch (e: IOException) {
                 if (!Thread.currentThread().isInterrupted) {
                     Log.e(TAG, "Server error: ${e.message}")
-                    logToUI("Erreur serveur: ${e.message}")
+                    logToUI(context.getString(R.string.tcp_server_error, e.message ?: ""))
                 }
             }
         }
@@ -74,7 +75,7 @@ class NmeaTcpServer(private val port: Int) {
                         out.write((data + "\r\n").toByteArray())
                         out.flush()
                         sentCount++
-                    } catch (e: IOException) {
+                    } catch (_: IOException) {
                         client.close()
                         iterator.remove()
                         errorCount++
@@ -82,7 +83,7 @@ class NmeaTcpServer(private val port: Int) {
                 }
 
                 if (errorCount > 0) {
-                    logToUI("Données envoyées à $sentCount clients, $errorCount déconnectés")
+                    logToUI(context.getString(R.string.tcp_data_sent, sentCount, errorCount))
                 }
             }
         }
@@ -93,7 +94,7 @@ class NmeaTcpServer(private val port: Int) {
     }
 
     fun stop() {
-        logToUI("Arrêt du serveur TCP...")
+        logToUI(context.getString(R.string.tcp_server_stopping))
         serverThread?.interrupt()
         clients.forEach {
             try {
@@ -108,6 +109,7 @@ class NmeaTcpServer(private val port: Int) {
         } catch (e: IOException) {
             Log.w(TAG, "Error closing server socket: ${e.message}")
         }
-        logToUI("Serveur TCP arrêté")
+        logToUI(context.getString(R.string.tcp_server_stopped))
     }
 }
+
