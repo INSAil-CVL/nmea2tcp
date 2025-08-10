@@ -82,18 +82,26 @@
     <string name="notif_channel_desc">NMEA over TCP</string>
     <string name="log_usb_start_service">USB device attached → starting service</string>
 
-    <!-- Status -->
-    <string name="usb_connected_with_baud">Connecté @ %1$d baud</string>
-    <string name="usb_status_permission_refused">Permission USB refusée</string>
-    <string name="usb_status_disconnected">Déconnecté</string>
-    <string name="usb_status_searching">Recherche en cours…</string>
+    <!-- Confirmation -->
+    <string name="notif_action_stop">Stop</string>
+    <string name="stop_service_title">Stop service</string>
+    <string name="stop_service_confirm">Do you really want to stop the service?</string>
+    <string name="stop_service_yes">Yes</string>
+    <string name="stop_service_no">No</string>
 
-    <!-- mots clés pour filtrer les logs techniques -->
-    <string name="usb_log_kw_driver">driver</string>
-    <string name="usb_log_kw_baud">baud</string>
-    <string name="usb_log_kw_test">test</string>
-    <string name="usb_log_kw_trying">trying</string>
-    <string name="usb_log_kw_loop">loop</string>
-    <string name="usb_log_kw_starting">starting</string>
+    <!-- Interface -->
+    <string name="btn_toggle_usb">USB on/off button</string>
+    <string name="btn_toggle_tcp">TCP on/off button</string>
+    <string name="btn_toggle_ip">Local IP on/off button</string>
+    <string name="btn_toggle_clients">Clients on/off button</string>
+    <string name="btn_main_toggle_cd">Main on/off button</string>
+    <!-- UI labels / placeholders -->
+    <string name="tcp_server_port_label">TCP Server: Port %1$d</string>
+    <string name="logs_system_title">System logs:</string>
+    <string name="nmea_latest_messages_title">Latest NMEA messages:</string>
+    <string name="clients_connected_initial">Clients connected: 0</string>
+    <string name="ip_locale_unknown">Local IP: unknown</string>
+    <!-- Errors surfaced in UI -->
+    <string name="service_start_error">Service start error: %1$s</string>
 
 </resources>

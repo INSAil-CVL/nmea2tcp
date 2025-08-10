@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -23,6 +24,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var logText: TextView
     private lateinit var nmeaText: TextView
     private lateinit var localIpText: TextView
+    private lateinit var btnMainToggle: ImageButton
+    private lateinit var tcpStatusText: TextView
+
 
     private val uiReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -31,7 +35,6 @@ class MainActivity : AppCompatActivity() {
                 GpsUsbForegroundService.ACTION_UI_STATUS -> {
                     val status = intent.getStringExtra(GpsUsbForegroundService.EXTRA_TEXT) ?: return
                     usbStatusText.text = status
-                    // option : colorer en fonction du contenu
                     val lower = status.lowercase()
                     val color = when {
                         lower.contains("connect") -> android.R.color.holo_green_dark
@@ -39,30 +42,36 @@ class MainActivity : AppCompatActivity() {
                         else -> android.R.color.darker_gray
                     }
                     usbStatusText.setTextColor(getColor(color))
+                    // Reflect ON/OFF on the big toggle
+                    btnMainToggle.isActivated = lower.contains("connect")
                 }
 
                 GpsUsbForegroundService.ACTION_UI_LOG -> {
                     val msg = intent.getStringExtra(GpsUsbForegroundService.EXTRA_TEXT) ?: return
                     appendToSystemView(msg)
-                    // Petites heuristiques pour colorer le statut si le service envoie des messages connus
+
                     when {
+                        // Ne pas réécrire le texte (pour ne pas perdre le deviceName), juste la couleur et l’état du bouton
                         msg.contains("connecté", ignoreCase = true) ||
                                 msg.contains("serial port opened", ignoreCase = true) -> {
-                            usbStatusText.text = getString(R.string.usb_connecte, "")
                             usbStatusText.setTextColor(getColor(android.R.color.holo_green_dark))
+                            btnMainToggle.isActivated = true
                         }
                         msg.contains("déconnecté", ignoreCase = true) ||
                                 msg.contains("refus", ignoreCase = true) ||
                                 msg.contains("failed", ignoreCase = true) -> {
                             usbStatusText.text = getString(R.string.usb_disconnected)
                             usbStatusText.setTextColor(getColor(android.R.color.holo_red_dark))
+                            btnMainToggle.isActivated = false
                         }
                     }
                 }
+
                 GpsUsbForegroundService.ACTION_UI_NMEA -> {
                     val nmea = intent.getStringExtra(GpsUsbForegroundService.EXTRA_TEXT) ?: return
                     appendToNmeaView(nmea)
                 }
+
                 GpsUsbForegroundService.ACTION_UI_CLIENTS -> {
                     val count = intent.getIntExtra(GpsUsbForegroundService.EXTRA_COUNT, 0)
                     clientCountText.text = getString(R.string.clients_connected, count)
@@ -75,27 +84,56 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Views
+        btnMainToggle = findViewById(R.id.btnMainToggle)
         clientCountText = findViewById(R.id.clientCountText)
         usbStatusText = findViewById(R.id.usbStatus)
         logText = findViewById(R.id.logText)
         nmeaText = findViewById(R.id.nmeaText)
         localIpText = findViewById(R.id.localIpText)
+        tcpStatusText = findViewById(R.id.tcpStatus)
 
+        // Init UI
         localIpText.text = getString(R.string.ip_locale, getLocalIpAddress())
         usbStatusText.text = getString(R.string.usb_searching)
         usbStatusText.setTextColor(getColor(android.R.color.holo_orange_dark))
+        localIpText.text = getString(R.string.ip_locale_unknown)
+        localIpText.text = getString(R.string.ip_locale, getLocalIpAddress())
+        tcpStatusText.text = getString(R.string.tcp_server_port_label, 10110)
 
-        // ✅ Démarre le Foreground Service (il gère USB + TCP + notif)
-        try {
-            val svc = Intent(this, GpsUsbForegroundService::class.java)
-                .setAction(GpsUsbForegroundService.ACTION_START)
-            ContextCompat.startForegroundService(this, svc)
-        } catch (e: Exception) {
-            Log.w(TAG, "Cannot start foreground service: ${e.message}")
-            appendToSystemView("Erreur de démarrage du service: ${e.message}")
+        // État initial du gros bouton (vert si service actif)
+        btnMainToggle.isActivated = GpsUsbForegroundService.isRunning
+
+        // Toggle start/stop via gros bouton
+        btnMainToggle.setOnClickListener {
+            if (GpsUsbForegroundService.isRunning) {
+                // Confirmation d’arrêt (reuse de l’activity de confirmation)
+                startActivity(Intent(this, StopServiceConfirmActivity::class.java))
+            } else {
+                // Démarrage du service
+                val svc = Intent(this, GpsUsbForegroundService::class.java)
+                    .setAction(GpsUsbForegroundService.ACTION_START)
+                ContextCompat.startForegroundService(this, svc)
+                // Feedback visuel immédiat
+                usbStatusText.text = getString(R.string.usb_searching)
+                usbStatusText.setTextColor(getColor(android.R.color.holo_orange_dark))
+                btnMainToggle.isActivated = true
+            }
         }
 
-        // ✅ Écoute uniquement les diffusions UI du service
+        // Démarre le Foreground Service au lancement de l'écran si non déjà actif
+        if (!GpsUsbForegroundService.isRunning) {
+            try {
+                val svc = Intent(this, GpsUsbForegroundService::class.java)
+                    .setAction(GpsUsbForegroundService.ACTION_START)
+                ContextCompat.startForegroundService(this, svc)
+            } catch (e: Exception) {
+                Log.w(TAG, "Cannot start foreground service: ${e.message}")
+                appendToSystemView(getString(R.string.service_start_error, e.message ?: ""))
+            }
+        }
+
+        // Écoute des diffusions UI du service
         val filter = IntentFilter().apply {
             addAction(GpsUsbForegroundService.ACTION_UI_LOG)
             addAction(GpsUsbForegroundService.ACTION_UI_NMEA)
@@ -146,5 +184,16 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         try { unregisterReceiver(uiReceiver) } catch (_: Exception) { }
+
+        // Quand l’activité est fermée, on stoppe le service si actif → la notif disparaît.
+        if (GpsUsbForegroundService.isRunning) {
+            try {
+                androidx.core.app.NotificationManagerCompat.from(this).cancelAll()
+            } catch (_: Exception) { }
+
+            try {
+                stopService(Intent(this, GpsUsbForegroundService::class.java))
+            } catch (_: Exception) { }
+        }
     }
 }

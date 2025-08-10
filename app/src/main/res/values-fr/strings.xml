@@ -83,17 +83,26 @@
     <string name="notif_channel_desc">NMEA over TCP</string>
     <string name="log_usb_start_service">USB device attached → starting service</string>
 
-    <!-- Status -->
-    <string name="usb_connected_with_baud">Connecté @ %1$d baud</string>
-    <string name="usb_status_permission_refused">Permission USB refusée</string>
-    <string name="usb_status_disconnected">Déconnecté</string>
-    <string name="usb_status_searching">Recherche en cours…</string>
+    <!-- Confirmation -->
+    <string name="notif_action_stop">Arrêter</string>
+    <string name="stop_service_title">Arrêter le service</string>
+    <string name="stop_service_confirm">Voulez-vous vraiment arrêter le service ?</string>
+    <string name="stop_service_yes">Oui</string>
+    <string name="stop_service_no">Non</string>
 
-    <!-- mots clés pour filtrer les logs techniques -->
-    <string name="usb_log_kw_driver">driver</string>
-    <string name="usb_log_kw_baud">baud</string>
-    <string name="usb_log_kw_test">test</string>
-    <string name="usb_log_kw_trying">trying</string>
-    <string name="usb_log_kw_loop">loop</string>
-    <string name="usb_log_kw_starting">starting</string>
+    <!-- Interface -->
+    <string name="btn_toggle_usb">Bouton on/off USB</string>
+    <string name="btn_toggle_tcp">Bouton on/off TCP</string>
+    <string name="btn_toggle_ip">Bouton on/off IP locale</string>
+    <string name="btn_toggle_clients">Bouton on/off Clients</string>
+    <string name="btn_main_toggle_cd">Bouton principal on/off</string>
+    <!-- UI labels / placeholders -->
+    <string name="tcp_server_port_label">Serveur TCP : Port %1$d</string>
+    <string name="logs_system_title">Logs système :</string>
+    <string name="nmea_latest_messages_title">Derniers messages NMEA :</string>
+    <string name="clients_connected_initial">Clients connectés : 0</string>
+    <string name="ip_locale_unknown">IP locale : inconnue</string>
+    <!-- Errors surfaced in UI -->
+    <string name="service_start_error">Erreur au démarrage du service : %1$s</string>
+
 </resources>

@@ -1,84 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <!-- Statut USB -->
-    <TextView
-        android:id="@+id/usbStatus"
+    <!-- Bloc entête : Gros bouton ON/OFF + 4 textes empilés -->
+    <LinearLayout
+        android:id="@+id/headerBlock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="USB : Déconnecté"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#FF0000"
-        android:layout_marginBottom="8dp" />
+        android:orientation="horizontal"
+        android:gravity="top"
+        android:layout_marginBottom="16dp">
 
-    <!-- Statut TCP -->
-    <TextView
-        android:id="@+id/tcpStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TCP Server: Port 10110"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_marginBottom="16dp" />
+        <!-- Gros bouton ON/OFF (prend la hauteur de la colonne de droite) -->
+        <ImageButton
+            android:id="@+id/btnMainToggle"
+            android:layout_width="56dp"
+            android:layout_height="match_parent"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:background="@drawable/bg_big_toggle_pill"
+            app:srcCompat="@drawable/ic_power"
+            app:tint="@android:color/white"
+            android:scaleType="center"
+            android:padding="8dp"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="@string/btn_main_toggle_cd" />
 
-    <!-- IP locale -->
-    <TextView
-        android:id="@+id/localIpText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="IP locale : inconnue"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_marginBottom="4dp" />
+        <!-- Colonne de droite : 4 textes -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-    <!-- Nombre de clients connectés -->
-    <TextView
-        android:id="@+id/clientCountText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Clients connectés : 0"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_marginBottom="16dp" />
+            <!-- Statut USB -->
+            <TextView
+                android:id="@+id/usbStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/usb_searching"
+                android:textColor="#FF0000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
+            <!-- Statut TCP -->
+            <TextView
+                android:id="@+id/tcpStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <!-- IP locale -->
+            <TextView
+                android:id="@+id/localIpText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/ip_locale_unknown"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <!-- Nombre de clients connectés -->
+            <TextView
+                android:id="@+id/clientCountText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/clients_connected_initial"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
 
     <!-- Logs système -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Logs système :"
+        android:layout_marginBottom="4dp"
+        android:text="@string/logs_system_title"
         android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="4dp" />
+        android:textStyle="bold" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:background="#DDDDDD"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        android:background="#DDDDDD">
 
         <TextView
             android:id="@+id/logText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text=""
-            android:textSize="14sp"
-            android:padding="8dp" />
+            android:textSize="14sp" />
     </ScrollView>
 
     <!-- Logs NMEA -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Derniers messages NMEA :"
+        android:layout_marginBottom="4dp"
+        android:text="@string/nmea_latest_messages_title"
         android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="4dp" />
+        android:textStyle="bold" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -90,9 +122,9 @@
             android:id="@+id/nmeaText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text=""
-            android:textSize="14sp"
-            android:padding="8dp" />
+            android:textSize="14sp" />
     </ScrollView>
 
 </LinearLayout>
