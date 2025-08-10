@@ -17,17 +17,22 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.001-beta"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("D:/AndroidStudioProjects/KeyStore/nmeagpsserver-jks.jks")
+            storePassword = System.getenv("KEYSTORE_PWD")
+            keyAlias = "nmea"
+            keyPassword = System.getenv("KEY_PWD")
+        }
+    }
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            isMinifyEnabled = false // ou true si tu configures ProGuard
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
