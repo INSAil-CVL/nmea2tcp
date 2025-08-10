@@ -7,11 +7,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 
-class SystemLogsActivity : AppCompatActivity() {
+class SystemLogsActivity : ThemedActivity() {
 
     private lateinit var logsText: TextView
 

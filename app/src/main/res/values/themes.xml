@@ -1,5 +1,88 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- File: app/src/main/res/values/themes.xml -->
 <resources>
 
-    <style name="Theme.Nmeagpsserver" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- ====== Base: TextView prend la couleur de texte primaire du thème ====== -->
+    <style name="App_TextView" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">?android:textColorPrimary</item>
+    </style>
+
+    <!-- ======================= Thèmes principaux ======================= -->
+
+    <!-- Thème clair -->
+    <style name="Theme_NmeaGps_Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/light_accent</item>
+        <item name="colorAccent">@color/light_accent</item>
+
+        <item name="android:windowBackground">@color/light_bg</item>
+        <item name="android:colorBackground">@color/light_bg</item>
+        <item name="colorSurface">@color/light_surface</item>
+
+        <item name="android:textColorPrimary">@color/light_text_primary</item>
+        <item name="android:textViewStyle">@style/App_TextView</item>
+    </style>
+
+    <!-- Thème sombre -->
+    <style name="Theme_NmeaGps_Dark" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/dark_accent</item>
+        <item name="colorAccent">@color/dark_accent</item>
+
+        <item name="android:windowBackground">@color/dark_bg</item>
+        <item name="android:colorBackground">@color/dark_bg</item>
+        <item name="colorSurface">@color/dark_surface</item>
+
+        <item name="android:textColorPrimary">@color/dark_text_primary</item>
+        <item name="android:textViewStyle">@style/App_TextView</item>
+    </style>
+
+    <!-- Thème rouge “faible luminosité” -->
+    <style name="Theme_NmeaGps_NightRed" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/night_red_accent</item>
+        <item name="colorAccent">@color/night_red_accent</item>
+
+        <item name="android:windowBackground">@color/night_red_bg</item>
+        <item name="android:colorBackground">@color/night_red_bg</item>
+        <item name="colorSurface">@color/night_red_surface</item>
+
+        <item name="android:textColorPrimary">@color/night_red_text_primary</item>
+        <item name="android:textViewStyle">@style/App_TextView</item>
+    </style>
+
+    <!-- =================== Styles pour les popup menus =================== -->
+
+    <style name="App_PopupMenuText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">?android:textColorPrimary</item>
+    </style>
+
+    <!-- Style de la fenêtre popup (overflow "⋮") -->
+    <style name="App_PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <!-- Ne garder que l'attribut android: -->
+        <item name="android:popupBackground">@drawable/bg_menu_popup</item>
+        <item name="textAppearanceLargePopupMenu">@style/App_PopupMenuText</item>
+        <item name="textAppearanceSmallPopupMenu">@style/App_PopupMenuText</item>
+    </style>
+
+    <!-- Fond des listes popup (fallback OEM) -->
+    <style name="App_ListPopupWindow" parent="Widget.AppCompat.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/bg_menu_popup</item>
+    </style>
+
+    <!-- ListView interne du menu -->
+    <style name="App_ListView_Popup" parent="Widget.AppCompat.ListView">
+        <item name="android:background">@drawable/bg_menu_popup</item>
+        <item name="android:listSelector">@drawable/menu_item_selector</item>
+        <item name="android:divider">@null</item>
+    </style>
+
+    <!-- Thème appliqué à la liste du menu -->
+    <style name="App_PanelMenuTheme" parent="ThemeOverlay.AppCompat">
+        <item name="android:listViewStyle">@style/App_ListView_Popup</item>
+    </style>
+
+    <!-- Overlay à poser sur la Toolbar -->
+    <style name="App_PopupMenuOverlay" parent="ThemeOverlay.AppCompat">
+        <item name="popupMenuStyle">@style/App_PopupMenu</item>
+        <item name="listPopupWindowStyle">@style/App_ListPopupWindow</item>
+        <item name="panelMenuListTheme">@style/App_PanelMenuTheme</item>
+    </style>
+
 </resources>

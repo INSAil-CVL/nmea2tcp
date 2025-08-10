@@ -1,10 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:key="pref_theme"
+        android:title="@string/settings_theme_title"
+        android:summary="@string/settings_theme_summary"
+        android:entries="@array/theme_entries"
+        android:entryValues="@array/theme_values"
+        android:defaultValue="light" />
 
     <Preference
         android:key="pref_system_logs"
         android:title="@string/logs_system_title"
         android:summary="@string/logs_system_summary" />
-
-    <!-- Vous pourrez ajouter ici d'autres catégories/préférences plus tard -->
 
 </PreferenceScreen>

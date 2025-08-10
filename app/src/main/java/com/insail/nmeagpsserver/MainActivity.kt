@@ -1,23 +1,22 @@
-// File: app/src/main/java/com/insail/nmeagpsserver/MainActivity.kt (updated: plus de logText)
 package com.insail.nmeagpsserver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import java.net.Inet4Address
 import java.net.NetworkInterface
-import android.hardware.usb.UsbManager
-import androidx.appcompat.app.AlertDialog
-import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ThemedActivity() {
     private lateinit var clientCountText: TextView
     private lateinit var usbStatusText: TextView
     private lateinit var nmeaText: TextView
@@ -25,6 +24,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnMainToggle: ImageButton
     private lateinit var tcpStatusText: TextView
     private lateinit var usbManager: UsbManager
+
+    // Lance Settings et recrée Main au retour (sécurité supplémentaire)
+    private val settingsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            recreate()
+        }
 
     private val uiReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -43,7 +48,6 @@ class MainActivity : AppCompatActivity() {
                     btnMainToggle.isActivated = lower.contains("connect")
                 }
                 GpsUsbForegroundService.ACTION_UI_LOG -> {
-                    // On ne maintient plus de vue locale des logs système ici.
                     val msg = intent.getStringExtra(GpsUsbForegroundService.EXTRA_TEXT) ?: return
                     when {
                         msg.contains("connecté", ignoreCase = true) ||
@@ -120,7 +124,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.settings -> { startActivity(Intent(this, SettingsActivity::class.java)); true }
+            R.id.action_settings -> {
+                settingsLauncher.launch(Intent(this, SettingsActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

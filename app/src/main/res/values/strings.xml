@@ -111,4 +111,12 @@
     <!-- Logs système -->
     <string name="logs_system_summary">Show history of internal logs of the application</string>
     <string name="clear">Clear</string>
+
+    <!-- Sélecteur de thème -->
+    <string name="settings_theme_title">Application theme</string>
+    <string name="settings_theme_summary">Choose the look : light, dark or low brightness</string>
+
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_night_red">Low brightness (red)</string>
 </resources>

@@ -5,15 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?android:colorBackground">
 
-    <!-- Toolbar en haut, pleine largeur -->
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Light"
+        app:popupTheme="@style/App_PopupMenuOverlay"
         app:title="@string/app_name" />
 
     <!-- Contenu avec marges latérales -->
@@ -28,7 +30,7 @@
         android:paddingTop="12dp"
         android:paddingBottom="16dp">
 
-        <!-- Bloc entête : Gros bouton ON/OFF + 4 textes empilés -->
+        <!-- En-tête -->
         <LinearLayout
             android:id="@+id/headerBlock"
             android:layout_width="match_parent"
@@ -45,7 +47,7 @@
                 android:minWidth="0dp"
                 android:background="@drawable/bg_big_toggle_pill"
                 app:srcCompat="@drawable/ic_power"
-                app:tint="@android:color/white"
+                app:tint="@color/toggle_icon_tint"
                 android:scaleType="center"
                 android:padding="8dp"
                 android:layout_marginEnd="12dp"
@@ -63,7 +65,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="@string/usb_searching"
-                    android:textColor="#FF0000"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -72,7 +73,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <TextView
@@ -81,7 +81,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
                     android:text="@string/ip_locale_unknown"
-                    android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <TextView
@@ -90,7 +89,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:text="@string/clients_connected_initial"
-                    android:textColor="#000000"
                     android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
@@ -108,7 +106,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="#EEEEEE">
+            android:background="?attr/colorSurface">
 
             <TextView
                 android:id="@+id/nmeaText"
@@ -116,7 +114,9 @@
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text=""
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:textColor="?android:textColorPrimary"
+                android:fontFamily="monospace" />
         </ScrollView>
     </LinearLayout>
 

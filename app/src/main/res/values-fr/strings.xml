@@ -112,4 +112,12 @@
     <!-- Logs système -->
     <string name="logs_system_summary">Afficher l’historique des logs internes de l’application</string>
     <string name="clear">Effacer</string>
+
+    <!-- Sélecteur de thème -->
+    <string name="settings_theme_title">Thème de l’application</string>
+    <string name="settings_theme_summary">Choisissez l’apparence : clair, sombre ou faible luminosité</string>
+
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="theme_night_red">Faible luminosité (rouge)</string>
 </resources>
