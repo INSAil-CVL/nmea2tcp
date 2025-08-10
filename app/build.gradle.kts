@@ -60,7 +60,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    // 🔧 nettoyé: (enlève le doublon core-ktx et la dépendance directe core)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.usb.serial)

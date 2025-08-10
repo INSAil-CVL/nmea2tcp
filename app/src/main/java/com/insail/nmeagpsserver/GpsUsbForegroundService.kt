@@ -21,6 +21,8 @@ class GpsUsbForegroundService : Service() {
         private const val CHANNEL_ID = "gps_usb_foreground"
         private const val NOTIF_ID = 42
 
+        const val EXTRA_DEVICE: String = "com.insail.nmeagpsserver.extra.DEVICE"
+
         const val ACTION_START = "com.insail.nmeagpsserver.action.START"
         const val ACTION_STOP = "com.insail.nmeagpsserver.action.STOP"
         const val ACTION_USB_PERMISSION = "com.insail.nmeagpsserver.USB_PERMISSION"
@@ -87,33 +89,41 @@ class GpsUsbForegroundService : Service() {
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
 
-        scanAndAttachIfPresent()
+        // scanAndAttachIfPresent()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ACTION_STOP) {
-            // Marque l'arrêt tout de suite
-            isRunning = false
+        when (intent?.action) {
+            ACTION_STOP -> {
+                // (inchangé)
+                isRunning = false
+                try { stopForeground(STOP_FOREGROUND_REMOVE) } catch (_: Exception) {}
+                try { (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancel(NOTIF_ID) } catch (_: Exception) {}
+                isForeground = false
+                stopSelfResult(startId)
+                return START_NOT_STICKY
+            }
+            ACTION_START -> {
+                // Si un device est fourni, on ne scanne pas : on tente directement ce device
+                @Suppress("DEPRECATION")
+                val device: UsbDevice? =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        intent.getParcelableExtra(EXTRA_DEVICE, UsbDevice::class.java)
+                    } else {
+                        intent.getParcelableExtra(EXTRA_DEVICE)
+                    }
 
-            // Retire la notif de foreground proprement
-            try {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-            } catch (_: Exception) {}
-
-            // Annule explicitement la notif
-            try {
-                val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                nm.cancel(NOTIF_ID)
-            } catch (_: Exception) {}
-
-            isForeground = false
-
-            // Stoppe le service
-            stopSelfResult(startId)
-            return START_NOT_STICKY
+                if (device != null) {
+                    handleDeviceAttached(device, explicit = true)
+                } else {
+                    // Comportement existant si aucun device n’est passé : on scanne
+                    scanAndAttachIfPresent()
+                }
+            }
         }
         return START_STICKY
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -220,12 +230,19 @@ class GpsUsbForegroundService : Service() {
         deviceList.values.forEach { device -> handleDeviceAttached(device) }
     }
 
-    private fun handleDeviceAttached(device: UsbDevice) {
+    private fun handleDeviceAttached(device: UsbDevice, explicit: Boolean = false) {
         logToUi(getString(R.string.usb_analysis,
             device.vendorId.toString(16).uppercase(),
             device.productId.toString(16).uppercase()))
 
-        if (isGpsDevice(device) || hasSerialDriver(device)) {
+        val ok = if (explicit) {
+            // si l’utilisateur a choisi le device, on ne filtre pas par isGpsDevice()
+            hasSerialDriver(device)
+        } else {
+            isGpsDevice(device) || hasSerialDriver(device)
+        }
+
+        if (ok) {
             if (usbManager.hasPermission(device)) {
                 logToUi(getString(R.string.usb_permission_already))
                 startReading(device)
@@ -243,6 +260,7 @@ class GpsUsbForegroundService : Service() {
             logToUi(getString(R.string.usb_device_ignored, device.deviceName))
         }
     }
+
 
     private fun hasSerialDriver(device: UsbDevice): Boolean {
         val availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)

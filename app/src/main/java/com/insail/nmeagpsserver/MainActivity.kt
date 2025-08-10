@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -13,12 +12,12 @@ import androidx.core.content.ContextCompat
 import java.net.Inet4Address
 import java.net.NetworkInterface
 
+import android.hardware.usb.UsbManager
+import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
+
+
 class MainActivity : AppCompatActivity() {
-
-    companion object {
-        private const val TAG = "MainActivity"
-    }
-
     private lateinit var clientCountText: TextView
     private lateinit var usbStatusText: TextView
     private lateinit var logText: TextView
@@ -26,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var localIpText: TextView
     private lateinit var btnMainToggle: ImageButton
     private lateinit var tcpStatusText: TextView
+    private lateinit var usbManager: UsbManager
 
 
     private val uiReceiver = object : BroadcastReceiver() {
@@ -104,7 +104,21 @@ class MainActivity : AppCompatActivity() {
         // État initial du gros bouton (vert si service actif)
         btnMainToggle.isActivated = GpsUsbForegroundService.isRunning
 
-        // Toggle start/stop via gros bouton
+        // Gestion des appareils USB
+        usbManager = getSystemService(USB_SERVICE) as UsbManager
+
+        btnMainToggle.setOnClickListener {
+            if (GpsUsbForegroundService.isRunning) {
+                // Confirmation d’arrêt (inchangé)
+                startActivity(Intent(this, StopServiceConfirmActivity::class.java))
+            } else {
+                // Nouveau : au lieu de démarrer “à l’aveugle”, on propose la sélection
+                showUsbDevicePicker()
+            }
+        }
+
+
+        /* // Toggle start/stop via gros bouton
         btnMainToggle.setOnClickListener {
             if (GpsUsbForegroundService.isRunning) {
                 // Confirmation d’arrêt (reuse de l’activity de confirmation)
@@ -128,10 +142,9 @@ class MainActivity : AppCompatActivity() {
                     .setAction(GpsUsbForegroundService.ACTION_START)
                 ContextCompat.startForegroundService(this, svc)
             } catch (e: Exception) {
-                Log.w(TAG, "Cannot start foreground service: ${e.message}")
                 appendToSystemView(getString(R.string.service_start_error, e.message ?: ""))
             }
-        }
+        }*/
 
         // Écoute des diffusions UI du service
         val filter = IntentFilter().apply {
@@ -180,6 +193,41 @@ class MainActivity : AppCompatActivity() {
         } catch (_: Exception) { }
         return getString(R.string.unknown)
     }
+
+    private fun showUsbDevicePicker() {
+        val devices = usbManager.deviceList.values.toList()
+        if (devices.isEmpty()) {
+            Toast.makeText(this, getString(R.string.usb_aucun_device), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Libellés lisibles : "deviceName (VID:PID)"
+        val labels = devices.map { d ->
+            val vid = "0x" + d.vendorId.toString(16).uppercase()
+            val pid = "0x" + d.productId.toString(16).uppercase()
+            "${d.deviceName} ($vid:$pid)"
+        }.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.select_usb_device_title))
+            .setItems(labels) { _, which ->
+                val selected = devices[which]
+                // Démarre le service en lui passant le device choisi
+                val svc = Intent(this, GpsUsbForegroundService::class.java)
+                    .setAction(GpsUsbForegroundService.ACTION_START)
+                    .putExtra(GpsUsbForegroundService.EXTRA_DEVICE, selected)
+
+                ContextCompat.startForegroundService(this, svc)
+
+                // Feedback UI immédiat
+                usbStatusText.text = getString(R.string.usb_permission_demande)
+                usbStatusText.setTextColor(getColor(android.R.color.holo_orange_dark))
+                btnMainToggle.isActivated = true
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()

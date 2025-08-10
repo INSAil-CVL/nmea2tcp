@@ -95,6 +95,7 @@
     <string name="btn_toggle_ip">Local IP on/off button</string>
     <string name="btn_toggle_clients">Clients on/off button</string>
     <string name="btn_main_toggle_cd">Main on/off button</string>
+    <string name="select_usb_device_title">Select a USB device</string>
     <!-- UI labels / placeholders -->
     <string name="tcp_server_port_label">TCP Server: Port %1$d</string>
     <string name="logs_system_title">System logs:</string>
