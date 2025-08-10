@@ -54,8 +54,6 @@ class GpsUsbForegroundService : Service() {
     private val notifReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == ACTION_NOTIF_DISMISS) {
-                // Si l’utilisateur tente de “swipe” la notif pendant que le service est actif,
-                // on la ré-affiche immédiatement (empêche le dismiss).
                 if (isRunning && isForeground) {
                     val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                     nm.notify(NOTIF_ID, buildNotification(lastStatus))
@@ -71,7 +69,6 @@ class GpsUsbForegroundService : Service() {
 
         createChannelIfNeeded()
 
-        // Foreground immédiat, notif non-dismissable
         startForeground(NOTIF_ID, buildNotification(getString(R.string.usb_searching)))
         isForeground = true
 
@@ -83,19 +80,15 @@ class GpsUsbForegroundService : Service() {
 
         registerUsbReceiver()
 
-        // Receiver pour intercepter le dismiss de la notif
         ContextCompat.registerReceiver(
             this, notifReceiver, IntentFilter(ACTION_NOTIF_DISMISS),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
-
-        // scanAndAttachIfPresent()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP -> {
-                // (inchangé)
                 isRunning = false
                 try { stopForeground(STOP_FOREGROUND_REMOVE) } catch (_: Exception) {}
                 try { (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancel(NOTIF_ID) } catch (_: Exception) {}
@@ -104,7 +97,6 @@ class GpsUsbForegroundService : Service() {
                 return START_NOT_STICKY
             }
             ACTION_START -> {
-                // Si un device est fourni, on ne scanne pas : on tente directement ce device
                 @Suppress("DEPRECATION")
                 val device: UsbDevice? =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -116,14 +108,12 @@ class GpsUsbForegroundService : Service() {
                 if (device != null) {
                     handleDeviceAttached(device, explicit = true)
                 } else {
-                    // Comportement existant si aucun device n’est passé : on scanne
                     scanAndAttachIfPresent()
                 }
             }
         }
         return START_STICKY
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
@@ -133,7 +123,6 @@ class GpsUsbForegroundService : Service() {
         usbNmeaReader?.stop()
         tcpServer.stop()
 
-        // Nettoyage notif
         try {
             stopForeground(STOP_FOREGROUND_REMOVE)
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -144,7 +133,6 @@ class GpsUsbForegroundService : Service() {
         isRunning = false
     }
 
-    // --- USB flow ---
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null) return
@@ -236,7 +224,6 @@ class GpsUsbForegroundService : Service() {
             device.productId.toString(16).uppercase()))
 
         val ok = if (explicit) {
-            // si l’utilisateur a choisi le device, on ne filtre pas par isGpsDevice()
             hasSerialDriver(device)
         } else {
             isGpsDevice(device) || hasSerialDriver(device)
@@ -260,7 +247,6 @@ class GpsUsbForegroundService : Service() {
             logToUi(getString(R.string.usb_device_ignored, device.deviceName))
         }
     }
-
 
     private fun hasSerialDriver(device: UsbDevice): Boolean {
         val availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)
@@ -312,7 +298,6 @@ class GpsUsbForegroundService : Service() {
         logToUi(getString(R.string.usb_reading_started))
     }
 
-    // --- Notifs / UI ---
     private fun createChannelIfNeeded() {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.createNotificationChannel(
@@ -333,14 +318,12 @@ class GpsUsbForegroundService : Service() {
         )
         val ip = getLocalIpAddress()
 
-        // Action Arrêter (confirm activity)
         val confirmStopIntent = Intent(this, StopServiceConfirmActivity::class.java)
         val confirmStopPendingIntent = PendingIntent.getActivity(
             this, 1, confirmStopIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        // DeleteIntent → intercepte un swipe dismiss
         val deleteIntent = PendingIntent.getBroadcast(
             this, 2,
             Intent(ACTION_NOTIF_DISMISS).setPackage(packageName),
@@ -352,11 +335,11 @@ class GpsUsbForegroundService : Service() {
             .setContentText("$status • ${getString(R.string.ip_locale, ip)} • TCP 10110")
             .setSmallIcon(R.drawable.ic_stat_name)
             .setContentIntent(pendingIntent)
-            .setOngoing(true) // non-dismissable par design
+            .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setOnlyAlertOnce(true)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-            .setDeleteIntent(deleteIntent) // si l’OS/constructeur laisse swipper, on ré-affiche
+            .setDeleteIntent(deleteIntent)
             .addAction(
                 R.drawable.ic_stat_name,
                 getString(R.string.notif_action_stop),
@@ -372,7 +355,12 @@ class GpsUsbForegroundService : Service() {
         nm.notify(NOTIF_ID, buildNotification(status))
     }
 
-    private fun logToUi(text: String) = sendToUi(ACTION_UI_LOG, text)
+    private fun logToUi(text: String) {
+        // Stockage dans le buffer mémoire
+        LogStore.append(text)
+        // Diffusion UI existante
+        sendToUi(ACTION_UI_LOG, text)
+    }
 
     private fun sendClientsCount() {
         val intent = Intent(ACTION_UI_CLIENTS).apply {
@@ -410,7 +398,6 @@ class GpsUsbForegroundService : Service() {
                 }
             }
         } catch (_: Exception) { }
-        // Pas de réseau → on renvoie localhost
         return "127.0.0.1"
     }
 }

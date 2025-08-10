@@ -106,4 +106,10 @@
     <!-- Errors surfaced in UI -->
     <string name="service_start_error">Erreur au démarrage du service : %1$s</string>
 
+    <!-- Paramètres -->
+    <string name="settings">Paramètres</string>
+
+    <!-- Logs système -->
+    <string name="logs_system_summary">Afficher l’historique des logs internes de l’application</string>
+    <string name="clear">Effacer</string>
 </resources>

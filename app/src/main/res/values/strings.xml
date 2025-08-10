@@ -105,4 +105,10 @@
     <!-- Errors surfaced in UI -->
     <string name="service_start_error">Service start error: %1$s</string>
 
+    <!-- Paramètres -->
+    <string name="settings">Settings</string>
+
+    <!-- Logs système -->
+    <string name="logs_system_summary">Show history of internal logs of the application</string>
+    <string name="clear">Clear</string>
 </resources>

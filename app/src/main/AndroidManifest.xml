@@ -1,75 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.insail.nmeagpsserver">
 
     <uses-feature android:name="android.hardware.usb.host" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Permissions Foreground Service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!-- Types recommandés Android 14+ -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-
-    <!-- Android 13+ : permission runtime pour afficher des notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
-        android:label="NMEA GPS Server"
+        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:icon="@mipmap/ic_launcher_new"
-        android:roundIcon="@mipmap/ic_launcher_new_round"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:localeConfig="@xml/locales_config"
-        tools:targetApi="33">
+        >
 
-        <!-- Pour AppCompat (rétro-compat et OEM tatillons) -->
-        <meta-data
-            android:name="androidx.appcompat.app.locale_config"
-            android:resource="@xml/locales_config" />
+        <activity
+            android:name=".SystemLogsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".StopServiceConfirmActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert" />
 
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
-            <!-- Lancement depuis le launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <!-- Pour détecter l’attache USB si l’activité est en avant-plan -->
-            <intent-filter>
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/device_filter" />
         </activity>
 
-        <!-- Stop Service Confirmation -->
-        <activity
-            android:name=".StopServiceConfirmActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.Dialog" />
-
-        <!-- Foreground Service (arrière-plan) -->
         <service
             android:name=".GpsUsbForegroundService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice|dataSync" />
 
-        <!-- Receiver pour lancer le service même si l’app est fermée -->
         <receiver
             android:name=".UsbAttachReceiver"
-            android:exported="false">
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
         </receiver>
 
     </application>
-
 </manifest>

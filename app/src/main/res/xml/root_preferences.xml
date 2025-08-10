@@ -1,0 +1,10 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:key="pref_system_logs"
+        android:title="@string/logs_system_title"
+        android:summary="@string/logs_system_summary" />
+
+    <!-- Vous pourrez ajouter ici d'autres catégories/préférences plus tard -->
+
+</PreferenceScreen>

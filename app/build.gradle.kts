@@ -68,6 +68,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.usb.serial)
+    implementation("androidx.preference:preference-ktx:1.2.1")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
