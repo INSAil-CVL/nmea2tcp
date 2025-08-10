@@ -14,17 +14,17 @@ Android app that reads NMEA GPS data from **any compatible USB device** (via a u
 
 ## 📑 Table of Contents
 
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [How it works](#how-it-works)
-- [Configuration (optional)](#configuration-optional)
-- [Project Structure](#project-structure)
-- [Build & Dependencies](#build--dependencies)
-- [Android Manifest & Permissions](#android-manifest--permissions)
-- [Resources (drawables/strings)](#resources-drawablesstrings)
-- [Troubleshooting](#troubleshooting)
-- [FAQ](#faq)
-- [License](#license)
+- [Features](#-features)
+- [Quick Start](#-quick-start)
+- [How it works](#-how-it-works)
+- [Configuration (optional)](#-configuration-optional)
+- [Project Structure](#-project-structure)
+- [Build & Dependencies](#-build--dependencies)
+- [Android Manifest & Permissions](#-android-manifest--permissions)
+- [Resources (drawables/strings)](#-resources-drawablesstrings)
+- [Troubleshooting](#t-roubleshooting)
+- [FAQ](#-faq)
+- [License](#-license)
 
 ---
 
