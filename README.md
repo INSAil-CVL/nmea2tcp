@@ -40,11 +40,14 @@ Android app that reads NMEA GPS data from **any compatible USB device** (via a u
 
 ## ⚡ Quick Start
 
-1. Build & install on an Android device with **USB host (OTG)**.
-2. Plug your USB GPS (or serial adapter).
-3. Open the app → tap the big button → **select your device** in the picker.
-4. In **OpenCPN**, add a TCP connection to `YOUR_DEVICE_IP:10110`.
-5. You should see NMEA data flowing in real time.
+1. Download the latest APK from the **[GitHub Releases](https://github.com/INSAil-CVL/nmeagpsserver/releases)** page  
+   *(Latest: `v0.0.001-beta`)*.
+2. Copy it to your Android device.
+3. Enable **installation from unknown sources** in your Android settings.
+4. Plug your USB GPS (or serial adapter) into the device.
+5. Open the app → tap the big button → **select your device** from the picker.
+6. In **OpenCPN**, add a TCP connection to `YOUR_DEVICE_IP:10110` or `127.0.0.1:10110` if it's on the same device.
+7. You should now see NMEA data flowing in real time.
 
 > Tip: the app shows your local IP on the main screen and in the foreground notification.
 
