@@ -99,7 +99,7 @@
     <string name="select_usb_device_title">Selectionner un périphérique USB</string>
     <!-- UI labels / placeholders -->
     <string name="tcp_server_port_label">Serveur TCP : Port %1$d</string>
-    <string name="logs_system_title">Logs système :</string>
+    <string name="logs_system_title">Logs système</string>
     <string name="nmea_latest_messages_title">Derniers messages NMEA :</string>
     <string name="clients_connected_initial">Clients connectés : 0</string>
     <string name="ip_locale_unknown">IP locale : inconnue</string>
@@ -115,9 +115,37 @@
 
     <!-- Sélecteur de thème -->
     <string name="settings_theme_title">Thème de l’application</string>
-    <string name="settings_theme_summary">Choisissez l’apparence : clair, sombre ou faible luminosité</string>
+    <string name="settings_theme_summary">Choisissez l’apparence : clair, sombre ou faible luminosité</string>
 
     <string name="theme_light">Clair</string>
     <string name="theme_dark">Sombre</string>
     <string name="theme_night_red">Faible luminosité (rouge)</string>
+
+
+    <!-- i18n -->
+    <string name="notif_alerts_channel_name">Alerte</string>
+    <string name="notif_alerts_title_usb">Problème USB</string>
+    <string name="notif_alerts_title_client">Client déconnecté</string>
+
+    <!-- Markers used to detect "USB read stopped / errors" in any locale -->
+    <string-array name="usb_stop_error_markers">
+        <!-- Put short prefixes or distinctive fragments; one per line -->
+        <item>read error</item>
+        <item>serial port closed</item>
+        <item>connection failed</item>
+        <item>reader stopped</item>
+        <item>usb: disconnected</item>
+        <!-- French defaults (example) -->
+        <item>erreur de lecture</item>
+        <item>port série fermé</item>
+        <item>échec connexion</item>
+        <item>lecteur arrêté</item>
+        <item>déconnect</item>
+    </string-array>
+
+    <!-- Markers used to detect "TCP client disconnected" -->
+    <string-array name="tcp_client_disconnect_markers">
+        <item>client disconnected</item>
+        <item>client déconnect</item>
+    </string-array>
 </resources>

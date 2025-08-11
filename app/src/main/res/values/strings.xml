@@ -98,7 +98,7 @@
     <string name="select_usb_device_title">Select a USB device</string>
     <!-- UI labels / placeholders -->
     <string name="tcp_server_port_label">TCP Server: Port %1$d</string>
-    <string name="logs_system_title">System logs:</string>
+    <string name="logs_system_title">System logs</string>
     <string name="nmea_latest_messages_title">Latest NMEA messages:</string>
     <string name="clients_connected_initial">Clients connected: 0</string>
     <string name="ip_locale_unknown">Local IP: unknown</string>
@@ -119,4 +119,31 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_night_red">Low brightness (red)</string>
+
+    <!-- i18n -->
+    <string name="notif_alerts_channel_name">Alerts</string>
+    <string name="notif_alerts_title_usb">USB issue</string>
+    <string name="notif_alerts_title_client">Client disconnected</string>
+
+    <!-- Markers used to detect "USB read stopped / errors" in any locale -->
+    <string-array name="usb_stop_error_markers">
+        <!-- Put short prefixes or distinctive fragments; one per line -->
+        <item>read error</item>
+        <item>serial port closed</item>
+        <item>connection failed</item>
+        <item>reader stopped</item>
+        <item>usb: disconnected</item>
+        <!-- French defaults (example) -->
+        <item>erreur de lecture</item>
+        <item>port série fermé</item>
+        <item>échec connexion</item>
+        <item>lecteur arrêté</item>
+        <item>déconnect</item>
+    </string-array>
+
+    <!-- Markers used to detect "TCP client disconnected" -->
+    <string-array name="tcp_client_disconnect_markers">
+        <item>client disconnected</item>
+        <item>client déconnect</item>
+    </string-array>
 </resources>

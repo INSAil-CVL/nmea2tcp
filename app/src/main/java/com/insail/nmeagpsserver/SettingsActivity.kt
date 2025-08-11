@@ -1,6 +1,7 @@
 // File: app/src/main/java/com/insail/nmeagpsserver/SettingsActivity.kt
 package com.insail.nmeagpsserver
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
@@ -18,11 +19,24 @@ class SettingsActivity : ThemedActivity() {
         supportActionBar?.title = getString(R.string.settings)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        toolbar.navigationIcon?.setTint(getColorFromAttr(R.attr.colorOnPrimary))
+
+        toolbar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.settings_container, RootPrefsFragment())
                 .commit()
         }
+    }
+
+    private fun Context.getColorFromAttr(attrColor: Int): Int {
+        val ta = theme.obtainStyledAttributes(intArrayOf(attrColor))
+        val color = ta.getColor(0, 0)
+        ta.recycle()
+        return color
     }
 
     override fun onSupportNavigateUp(): Boolean {

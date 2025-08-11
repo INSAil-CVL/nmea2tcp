@@ -1,0 +1,4 @@
+<resources>
+    <!-- Attributs custom utilisables dans les thèmes ET depuis le code -->
+    <attr name="colorOnPrimary" format="color"/>
+</resources>

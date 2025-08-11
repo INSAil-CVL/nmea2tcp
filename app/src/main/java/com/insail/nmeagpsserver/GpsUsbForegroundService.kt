@@ -10,16 +10,20 @@ import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import java.net.Inet4Address
 import java.net.NetworkInterface
-import androidx.core.content.ContextCompat
 
 class GpsUsbForegroundService : Service() {
 
     companion object {
         private const val CHANNEL_ID = "gps_usb_foreground"
         private const val NOTIF_ID = 42
+
+        private const val ALERT_CHANNEL_ID = "gps_usb_alerts"
+        private const val ALERT_NOTIF_TAG = "alerts"
+        private const val ALERT_COOLDOWN_MS = 5_000L
 
         const val EXTRA_DEVICE: String = "com.insail.nmeagpsserver.extra.DEVICE"
 
@@ -49,6 +53,10 @@ class GpsUsbForegroundService : Service() {
     @Volatile private var isForeground: Boolean = false
     @Volatile private var lastStatus: String = ""
 
+    // Anti‑spam alertes
+    @Volatile private var lastUsbAlertTs: Long = 0L
+    @Volatile private var lastClientAlertTs: Long = 0L
+
     override fun onBind(intent: Intent?) = null
 
     private val notifReceiver = object : BroadcastReceiver() {
@@ -68,12 +76,34 @@ class GpsUsbForegroundService : Service() {
         usbManager = getSystemService(USB_SERVICE) as UsbManager
 
         createChannelIfNeeded()
+        createAlertChannelIfNeeded()
 
         startForeground(NOTIF_ID, buildNotification(getString(R.string.usb_searching)))
         isForeground = true
 
         tcpServer = NmeaTcpServer(10110, this).apply {
-            setLogCallback { msg -> logToUi(getString(R.string.tcp_message, msg)) }
+            setLogCallback { msg ->
+                // Log UI existant
+                logToUi(getString(R.string.tcp_message, msg))
+
+                // Détection i18n « client déconnecté » via préfixe localisé
+                val ml = msg.lowercase()
+
+                val clientMarkers = try {
+                    resources.getStringArray(R.array.tcp_client_disconnect_markers).map { it.lowercase() }
+                } catch (_: Exception) {
+                    emptyList()
+                }
+                val clientFallback = listOf("client disconnected", "client déconnect")
+
+                val isClientDisconnected =
+                    clientMarkers.any { m -> m.isNotBlank() && ml.contains(m) } ||
+                            clientFallback.any { m -> ml.contains(m) }
+
+                if (isClientDisconnected) {
+                    maybeAlertClient(msg)
+                }
+            }
         }
         tcpServer.start()
         logToUi(getString(R.string.tcp_server_started, 10110))
@@ -186,6 +216,9 @@ class GpsUsbForegroundService : Service() {
                             logToUi(getString(R.string.usb_device_disconnected, it.deviceName))
                             updateForeground(getString(R.string.usb_disconnected))
                             sendStatusToUi(getString(R.string.usb_disconnected))
+
+                            // Alerte prioritaire "USB déconnecté"
+                            maybeAlertUsb(getString(R.string.usb_disconnected))
                         }
                     }
                 }
@@ -290,6 +323,31 @@ class GpsUsbForegroundService : Service() {
                     updateForeground(msg.take(60))
                     sendStatusToUi(msg.take(120))
                 }
+
+                // --- Détection i18n d'arrêt/erreur de lecture USB (prefixes localisés) ---
+                val msgLc = msg.lowercase()
+
+                // 1) Marqueurs i18n configurables
+                val usbMarkers = try {
+                    resources.getStringArray(R.array.usb_stop_error_markers).map { it.lowercase() }
+                } catch (_: Exception) {
+                    emptyList()
+                }
+
+                // 2) Filet de sécurité (hard‑coded, stable)
+                val usbFallbackMarkers = listOf(
+                    "read error", "serial port closed", "connection failed", "reader stopped",
+                    "usb: disconnected", "erreur", "déconnect"
+                )
+
+                val looksLikeUsbStopOrError =
+                    usbMarkers.any { marker -> marker.isNotBlank() && msgLc.contains(marker) } ||
+                            usbFallbackMarkers.any { marker -> msgLc.contains(marker) }
+
+                if (looksLikeUsbStopOrError) {
+                    maybeAlertUsb(msg)
+                }
+
             }
         )
         usbNmeaReader?.start()
@@ -297,6 +355,8 @@ class GpsUsbForegroundService : Service() {
         sendStatusToUi(getString(R.string.usb_connecte, device.deviceName))
         logToUi(getString(R.string.usb_reading_started))
     }
+
+    // ===== Notifications =====
 
     private fun createChannelIfNeeded() {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -308,6 +368,22 @@ class GpsUsbForegroundService : Service() {
             ).apply { description = getString(R.string.notif_channel_desc) }
         )
     }
+
+    private fun createAlertChannelIfNeeded() {
+        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        nm.createNotificationChannel(
+            NotificationChannel(
+                ALERT_CHANNEL_ID,
+                getString(R.string.notif_alerts_channel_name),
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = getString(R.string.notif_channel_desc)
+                enableVibration(true)
+                setShowBadge(true)
+            }
+        )
+    }
+
 
     private fun buildNotification(status: String): Notification {
         lastStatus = status
@@ -355,6 +431,51 @@ class GpsUsbForegroundService : Service() {
         nm.notify(NOTIF_ID, buildNotification(status))
     }
 
+    private fun showPriorityAlert(title: String, text: String) {
+        val pendingIntent = PendingIntent.getActivity(
+            this, 100,
+            Intent(this, MainActivity::class.java),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val notif = NotificationCompat.Builder(this, ALERT_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_stat_name)
+            .setContentTitle(title)
+            .setContentText(text.take(120))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text.take(600)))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ERROR)
+            .setAutoCancel(true)
+            .setOnlyAlertOnce(false)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        nm.notify(ALERT_NOTIF_TAG, System.currentTimeMillis().toInt(), notif)
+    }
+
+    private fun maybeAlertUsb(message: String) {
+        val now = System.currentTimeMillis()
+        if (now - lastUsbAlertTs > ALERT_COOLDOWN_MS) {
+            val title = getString(R.string.notif_alerts_title_usb)
+            showPriorityAlert(title, message)
+            lastUsbAlertTs = now
+        }
+    }
+
+    private fun maybeAlertClient(message: String) {
+        val now = System.currentTimeMillis()
+        if (now - lastClientAlertTs > ALERT_COOLDOWN_MS) {
+            val title = getString(R.string.notif_alerts_title_client)
+            showPriorityAlert(title, message)
+            lastClientAlertTs = now
+        }
+    }
+
+
+    // ===== UI/IPC =====
+
     private fun logToUi(text: String) {
         // Stockage dans le buffer mémoire
         LogStore.append(text)
@@ -385,6 +506,8 @@ class GpsUsbForegroundService : Service() {
         }
         sendBroadcast(intent)
     }
+
+    // ===== Util =====
 
     private fun getLocalIpAddress(): String {
         try {

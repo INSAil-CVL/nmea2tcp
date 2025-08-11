@@ -33,17 +33,24 @@ class SystemLogsActivity : ThemedActivity() {
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        supportActionBar?.title = getString(R.string.logs_system_title)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         // 🔒 Empêche l’overflow natif
         toolbar.menu.clear()
         toolbar.overflowIcon = null
 
-        supportActionBar?.title = getString(R.string.logs_system_title)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        // ✅ Teinte la flèche avec la même couleur que le titre / bouton ⋮
+        toolbar.navigationIcon?.setTint(getColorFromAttr(R.attr.colorOnPrimary))
 
         overflowBtn = findViewById(R.id.overflowBtn)
         overflowBtn.setOnClickListener { showOverflowMenu() }
 
         logsText = findViewById(R.id.logsText)
+
+        toolbar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         val snapshot = LogStore.snapshot()
         if (snapshot.isNotEmpty()) {
@@ -62,6 +69,13 @@ class SystemLogsActivity : ThemedActivity() {
             }
         }
         popup.show()
+    }
+
+    private fun Context.getColorFromAttr(attrColor: Int): Int {
+        val ta = theme.obtainStyledAttributes(intArrayOf(attrColor))
+        val color = ta.getColor(0, 0)
+        ta.recycle()
+        return color
     }
 
     override fun onStart() {
