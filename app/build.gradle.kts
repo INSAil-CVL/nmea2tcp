@@ -17,7 +17,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 1
-        versionName = "0.0.001-beta"
+        versionName = "1.0.000"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -68,7 +68,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.usb.serial)
-    implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation(libs.androidx.preference.ktx)
 
 
     testImplementation(libs.junit)
