@@ -1,3 +1,4 @@
+// File: app/src/main/java/com/insail/nmeagpsserver/MainActivity.kt
 package com.insail.nmeagpsserver
 
 import android.content.BroadcastReceiver
@@ -6,11 +7,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.UsbManager
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import java.net.Inet4Address
@@ -24,12 +27,11 @@ class MainActivity : ThemedActivity() {
     private lateinit var btnMainToggle: ImageButton
     private lateinit var tcpStatusText: TextView
     private lateinit var usbManager: UsbManager
+    private lateinit var overflowBtn: ImageButton
 
-    // Lance Settings et recrée Main au retour (sécurité supplémentaire)
+    // Au retour de Settings, force un recreate (sécurité + thème)
     private val settingsLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            recreate()
-        }
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { recreate() }
 
     private val uiReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -82,6 +84,12 @@ class MainActivity : ThemedActivity() {
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        // 🔒 Empêche l’overflow natif : pas de menu attaché + pas d’icône
+        toolbar.menu.clear()
+        toolbar.overflowIcon = null
+
+        overflowBtn = findViewById(R.id.overflowBtn)
+        overflowBtn.setOnClickListener { showOverflowMenu() }
 
         btnMainToggle = findViewById(R.id.btnMainToggle)
         clientCountText = findViewById(R.id.clientCountText)
@@ -112,24 +120,24 @@ class MainActivity : ThemedActivity() {
             addAction(GpsUsbForegroundService.ACTION_UI_CLIENTS)
             addAction(GpsUsbForegroundService.ACTION_UI_STATUS)
         }
-        ContextCompat.registerReceiver(
-            this, uiReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED
-        )
+        ContextCompat.registerReceiver(this, uiReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
+    // IMPORTANT : pas de onCreateOptionsMenu / onOptionsItemSelected → on n’attache aucun menu au Toolbar
 
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                settingsLauncher.launch(Intent(this, SettingsActivity::class.java))
-                true
+    private fun showOverflowMenu() {
+        val wrapper = ContextThemeWrapper(this, R.style.App_PopupWrapper)
+        val popup = PopupMenu(wrapper, overflowBtn)
+        popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_settings -> {
+                    settingsLauncher.launch(Intent(this, SettingsActivity::class.java)); true
+                }
+                else -> false
             }
-            else -> super.onOptionsItemSelected(item)
         }
+        popup.show()
     }
 
     private fun appendToNmeaView(nmea: String) {

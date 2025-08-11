@@ -4,13 +4,13 @@
     <color name="light_bg">#FFFFFFFF</color>
     <color name="light_surface">#F5F5F5</color>
     <color name="light_text_primary">#000000</color>
-    <color name="light_accent">#3F51B5</color>
+    <color name="light_accent">#6497D0</color>
 
     <!-- Palette sombre -->
     <color name="dark_bg">#FF121212</color>
     <color name="dark_surface">#FF1E1E1E</color>
     <color name="dark_text_primary">#FFFFFFFF</color>
-    <color name="dark_accent">#BB86FC</color>
+    <color name="dark_accent">#312F88</color>
 
     <!-- Palette "faible luminosité" rouge -->
     <color name="night_red_bg">#FF000000</color>

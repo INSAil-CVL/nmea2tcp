@@ -6,13 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.ContextThemeWrapper
+import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 
 class SystemLogsActivity : ThemedActivity() {
 
     private lateinit var logsText: TextView
+    private lateinit var overflowBtn: ImageButton
 
     private val uiLogReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -29,16 +33,35 @@ class SystemLogsActivity : ThemedActivity() {
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        // 🔒 Empêche l’overflow natif
+        toolbar.menu.clear()
+        toolbar.overflowIcon = null
+
         supportActionBar?.title = getString(R.string.logs_system_title)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        overflowBtn = findViewById(R.id.overflowBtn)
+        overflowBtn.setOnClickListener { showOverflowMenu() }
+
         logsText = findViewById(R.id.logsText)
 
-        // Charger l’historique au démarrage
         val snapshot = LogStore.snapshot()
         if (snapshot.isNotEmpty()) {
             logsText.text = snapshot.joinToString("\n")
         }
+    }
+
+    private fun showOverflowMenu() {
+        val wrapper = ContextThemeWrapper(this, R.style.App_PopupWrapper)
+        val popup = PopupMenu(wrapper, overflowBtn)
+        popup.menuInflater.inflate(R.menu.menu_system_logs, popup.menu)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_clear_logs -> { LogStore.clear(); logsText.text = ""; true }
+                else -> false
+            }
+        }
+        popup.show()
     }
 
     override fun onStart() {
@@ -54,23 +77,6 @@ class SystemLogsActivity : ThemedActivity() {
     override fun onStop() {
         super.onStop()
         try { unregisterReceiver(uiLogReceiver) } catch (_: Exception) {}
-    }
-
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_system_logs, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> { finish(); true }
-            R.id.action_clear_logs -> {
-                LogStore.clear()
-                logsText.text = ""
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     private fun appendLine(line: String) {

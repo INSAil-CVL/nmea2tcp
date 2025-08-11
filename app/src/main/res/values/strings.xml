@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NMEA GPS Server</string>
+    <string name="app_name">NMEA 2 TCP</string>
     <string name="clients_connected">Clients connected: %1$d</string>
     <string name="ip_locale">Local IP: %1$s</string>
     <string name="usb_searching">USB: Searching…</string>

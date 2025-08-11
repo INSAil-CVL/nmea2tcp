@@ -14,7 +14,21 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Light"
-        app:popupTheme="@style/App_PopupMenuOverlay" />
+        app:title="@string/app_name"
+        app:titleTextColor="?attr/colorOnPrimary">
+
+        <ImageButton
+            android:id="@+id/overflowBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:background="?selectableItemBackgroundBorderless"
+            app:srcCompat="@drawable/ic_more_vert"
+            app:tint="?attr/colorOnPrimary"
+            android:contentDescription="@string/logs_system_title" />
+    </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
         android:id="@+id/logsContentWrapper"
